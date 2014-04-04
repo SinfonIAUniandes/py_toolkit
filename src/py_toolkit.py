@@ -138,9 +138,6 @@ class PyToolkit:
         print(consoleFormatter.format('Move_head_srv on!', 'OKGREEN'))
 
         self.motionSetAngleServer = rospy.Service('pytoolkit/ALMotion/set_angle_srv', set_angle_srv, self.callback_motion_set_angle_srv)
-        print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))  
-
-        self.motionGetAngleServer = rospy.Service('pytoolkit/ALMotion/get_angle_srv', get_segmentation3D_srv, self.callback_motion_get_angle_srv)
         print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))
 
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
@@ -408,15 +405,9 @@ class PyToolkit:
     
     def callback_motion_set_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
-        response = get_segmentation3D_srvResponse()
-        response.coordinates = self.ALMotion.getAngles("Head",False)
-        return set_angle_srvResponse("OK")
-    
-    def callback_motion_get_angle_srv(self,req):
-        print(consoleFormatter.format("\nRequested ALMotion/get_angle_srv", "WARNING"))
         self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
-        print(consoleFormatter.format('Angles set!', 'OKGREEN'))
-        return response
+	print(consoleFormatter.format('Angles set!', 'OKGREEN'))
+	return set_angle_srvResponse("OK")
 
     def callback_motion_set_move_arms_enabled_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/set_move_arms_enabled_srv", "WARNING"))
@@ -703,7 +694,7 @@ class PyToolkit:
         contador = 0;
 		function displayWords(index) {
 		    if (index < words.length) {
-            if (contador>=28){
+            if (contador>=18){
                 textoConcatenado = ""; 
                 outputDiv.innerText = "";
                 contador = 0;
@@ -713,18 +704,19 @@ class PyToolkit:
             contador++;
 			setTimeout(function() {
 			    displayWords(index + 1);
-			}, 250); 
+			}, 450); 
 		    }
 		}
 
 		displayWords(1);
             """
+	    nuevo_string = msg.text
             if "rspd" in msg.text:
                 for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
                     if not caracter.isdigit():
                         nuevo_string = msg.text.replace("\\","").replace("rspd=","")[i:]
                         break
-            script = script.replace("+++",nuevo_string)
+            script = script.replace("+++",str(nuevo_string+" "))
             self.ALTabletService.executeJS(script)
             
         
