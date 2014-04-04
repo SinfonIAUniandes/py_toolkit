@@ -182,6 +182,7 @@ class PyToolkit:
             print(consoleFormatter.format('Autonomous life is on!', 'OKGREEN'))
         else:
             self.ALAutonomousLife.setState("disabled")
+            self.ALAutonomousLife.stopAll()
             self.callback_posture_go_to_posture_srv(go_to_posture_srvRequest("stand"))
             print(consoleFormatter.format('Autonomous life is off!', 'OKGREEN'))
         return SetBoolResponse(True, "OK")
@@ -191,10 +192,10 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALBasicAwareness/set_awareness_srv", "WARNING"))
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
         if req.data:
-            self.ALBasicAwareness.setEnabled(req.data)
+            self.ALBasicAwareness.resumeAwareness()
             print(consoleFormatter.format('Awareness is on!', 'OKGREEN'))
         else:
-            self.ALBasicAwareness.setEnabled(req.data)
+            self.ALBasicAwareness.pauseAwareness()
             print(consoleFormatter.format('Awareness is off!', 'OKGREEN'))
         return SetBoolResponse(True, "OK")
 
@@ -467,7 +468,7 @@ if __name__ == '__main__':
             pytoolkit.ALBasicAwareness.setEnabled(False)
         pytoolkit.ALBasicAwareness.resumeAwareness()
         pytoolkit.ALBasicAwareness.pauseAwareness()
-        pytoolkit.ALBasicAwareness.resumeAwareness()
+	pytoolkit.ALTrackerService.stopTracker()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         print("overloading tablet...")
         for i in range(10):
