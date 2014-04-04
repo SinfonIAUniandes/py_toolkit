@@ -584,8 +584,9 @@ class PyToolkit:
     def callback_tablet_show_picture_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_picture_srv", "WARNING"))
         self.showing_words = False
-        self.ALPhotoCapture.takePicture("/home/nao/.local/share/PackageManager/apps/robot-page/html/img/","picture.png")
-        self.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/picture.png")
+        self.ALPhotoCapture.takePicture("/home/nao/.local/share/PackageManager/apps/robot-page/html/img/","picture",True)
+	rospy.sleep(2)
+        self.ALTabletService.showImageNoCache("http://198.18.0.1/apps/robot-page/img/picture.jpg")
         print(consoleFormatter.format('Showing picture taken in tablet!', 'OKGREEN'))
         return "OK"    
 
