@@ -311,6 +311,7 @@ class PyToolkit:
             dance_hands.dance(self.ALMotion)
         elif req.volume==3:
             dance_asereje.dance(self.ALMotion,self.ALAudioPlayer)
+	self.ALAudioPlayer.stopAll()
         return str("OK") 
 
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
@@ -732,7 +733,7 @@ class PyToolkit:
             contador++;
 			setTimeout(function() {
 			    displayWords(index + 1);
-			}, 450); 
+			}, 400); 
 		    }
 		}
 
