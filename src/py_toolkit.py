@@ -190,7 +190,7 @@ class PyToolkit:
         self.ALMotion.setOrthogonalSecurityDistance(req.distance)
         self.ALMotion.setTangentialSecurityDistance(req.distance)
         self.ALMotion.setCollisionProtectionEnabled("Arms", False)
-        self.ALMotion.setExternalCollisionProtectionEnabled("Arms", False)
+        self.ALMotion.setExternalCollisionProtectionEnabled("All", False)
         print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
         return set_security_distance_srvResponse("OK")
     
