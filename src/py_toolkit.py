@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse
+from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -22,7 +22,8 @@ class PyToolkit:
 
         #CONSTANTS
         self.PYTOOLKIT_FOLDER=rospkg.RosPack().get_path("py_toolkit")
-
+        #Crea una constante para guardar las id's conseguidas por el pytoolkit/perception
+        self.id = 0
         # Publishers
         self.ALTextToSpeechStatusPublisher = rospy.Publisher('/pytoolkit/ALTextToSpeech/status', text_to_speech_status_msg, queue_size=10)
         print(consoleFormatter.format("ALTextToSpeech/status topic is up!","OKGREEN"))
@@ -35,9 +36,9 @@ class PyToolkit:
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
         self.ALTextToSpeechStatusSubscriber.signal.connect(self.on_tts_status)
 
-        self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
-        self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
-
+        # Perception Subscriber
+        self.ALPeoplePerceptionSubscriber = self.ALMemory.subscriber("PeoplePerception/JustArrived")
+        self.ALPeoplePerceptionSubscriber.signal.connect(self.on_Perception_Tshirt)
 
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
@@ -51,9 +52,10 @@ class PyToolkit:
         self.ALSegmentation3D = session.service("ALSegmentation3D")
         self.ALSegmentation3D.subscribe("pytoolkit")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
+        self.ALPeoplePerception = session.service("ALPeoplePerception")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
-        
+        self.ALBatteryService = session.service("ALBattery")
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -89,6 +91,9 @@ class PyToolkit:
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
         print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
 
+        self.motionSetStiffnessesServer = rospy.Service('pytoolkit/ALMotion/set_stiffnesses_srv', set_stiffnesses_srv, self.callback_set_stiffnesses_srv)
+        print(consoleFormatter.format('set_stiffnesses_srv on!', 'OKGREEN'))
+
 
         # Service ROS Servers - ALNavigation
         self.navigationNavigateToServer = rospy.Service('pytoolkit/ALNavigation/navigate_to_srv', navigate_to_srv, self.callback_navigation_navigate_to_srv)
@@ -101,6 +106,10 @@ class PyToolkit:
 
         # Service ROS Servers - ALSegmentation3D
         self.segmentation3DGetSegmentation3DServer = rospy.Service('pytoolkit/ALSegmentation3D/get_segmentation3D_srv', get_segmentation3D_srv, self.callback_segmentation3D_get_segmentation3D_srv)
+
+        # Service ROS Servers - ALBatteryService
+        self.getBatteryPorcentage = rospy.Service('pytoolkit/ALBatteryService/get_porcentage', battery_service_srv, self.callback_battery_get_porcentage_srv)
+        print(consoleFormatter.format('get_porcentage_srv on!', 'OKGREEN'))   
 
         # Service ROS Servers - ALTabletService
         self.tabletShowImageServer = rospy.Service('pytoolkit/ALTabletService/show_image_srv', tablet_service_srv, self.callback_tablet_show_image_srv)
@@ -132,6 +141,12 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()  
 
+        # Service ROS Servers - ALPerception
+        
+        self.Server = rospy.Service('pytoolkit/ALPerception/Tshirt_color_srv', Tshirt_color_srv, self.callback_Tshirt_color__srv)
+        print(consoleFormatter.format('Tshirt_color__srv!', 'OKGREEN')) 
+
+        
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -250,6 +265,12 @@ class PyToolkit:
         else:
             print(consoleFormatter.format("RArm movement has been disabled!", "OKGREEN"))
         return set_move_arms_enabled_srvResponse("OK")
+        
+    def callback_set_stiffnesses_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_stiffnesses_srv", "WARNING"))
+        self.ALMotion.setStiffnesses(req.names, req.stiffnesses)
+        print(consoleFormatter.format('Stiffness set!', 'OKGREEN'))
+        return set_stiffnesses_srvResponse("OK") 
 
     # ----------------------------------------------------ALNavigation-------------------------------------------------
 
@@ -281,7 +302,21 @@ class PyToolkit:
         coordinates = list(self.ALSegmentation3D.getTopOfBlob(-1, 0, False))
         response.coordinates = coordinates
         return response
+    
+    # ----------------------------------------------------ALPerception------------------------------------------------
+       
+    def callback_Tshirt_color__srv(self, req):
+        print(consoleFormatter.format("\nRequested ALPerception/Tshirt_color_srv", "WARNING"))
+        id = self.id
+        color = self.ALMemory.getData('PeoplePerception/Person/'+id+'/ShirtColor')
+        return color
 
+    # ----------------------------------------------------ALBatteryService------------------------------------------------
+
+    def callback_battery_get_porcentage_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALBatteryService/get_porcentage_srv", "WARNING"))
+        return self.ALBatteryService.getBatteryCharge()
+    
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
     def callback_tablet_show_image_srv(self, req):
@@ -402,6 +437,9 @@ class PyToolkit:
     def on_speech_recognition_status(self, value):
         status = value
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
+
+    def on_Perception_Tshirt(self, id):
+        self.id = id 
 
 
 if __name__ == '__main__':
