@@ -686,20 +686,10 @@ class PyToolkit:
     def on_words(self, msg):
         if self.showing_words:
             script = """
-            const palabras = "+++".split(" ");
-            const outputDiv = document.getElementById('output');
-            let textoConcatenado = '';
-
-            for (let i = 0; i < palabras.length; i++) {
-                setTimeout(() => {
-                    textoConcatenado += palabras[i] + ' ';
-                    outputDiv.innerText = textoConcatenado;
-                }, 1000 * i);
-            }
-
-            setTimeout(() => {
-                outputDiv.innerText = "";
-            }, 10000);
+        	palabras = "+++".replace(/^\d+/, '');
+        	outputDiv = document.getElementById('output');
+       		outputDiv.innerText = "";
+	        outputDiv.innerText = palabras;
             """
             if "rspd" in msg.text:
                 for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
