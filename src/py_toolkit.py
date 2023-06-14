@@ -6,11 +6,7 @@ import time
 import rospy
 import argparse
 import sys
-<<<<<<< HEAD
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse
-=======
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, get_input_srv
->>>>>>> 0f7e879f5458f4f89bfc88b3abf0a294e97a2abb
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
 
