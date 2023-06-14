@@ -207,13 +207,9 @@ class PyToolkit:
 
             var textbox = document.createElement("input");
             textbox.id = "input_id";
-            var array = {text}.split(",")
+            var array = {text}.split(",");
             for (var i = 0; i<array.length; i++)
-            {
-                var opt = document.createElement('option');
-                opt.value = array[i];
-                textbox.appendChild(opt);
-            }
+            {codigo2}
 
             var sendButton = document.createElement("input");
             sendButton.type = "button";
@@ -226,7 +222,7 @@ class PyToolkit:
             var container = document.getElementById("container");
 
             container.appendChild(form);
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);")
         elif req.type=="list":
             script="""
             """
