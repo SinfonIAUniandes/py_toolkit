@@ -165,6 +165,7 @@ class PyToolkit:
 
     def getInput(self,event):
         self.input=event
+        promise.setValue(True)
 
     def callback_tablet_get_input_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
@@ -208,8 +209,15 @@ class PyToolkit:
         elif req.type=="list":
             script="""
             """
+        signalID = 0
+        promise = qi.Promise()
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+        try:
+            promise.future().hasValue(30000)
+        except RuntimeError:
+            raise RuntimeError('Timeout: no signal triggered')
         self.ALTabletService.executeJS(script)
+        self.ALTabletService.onJSEvent.disconnect(signalID)
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
         return self.input
     
