@@ -88,7 +88,7 @@ class PyToolkit:
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
 
     def callback_autonomous_set_state_srv(self, req):
-	print(consoleFormatter.format("\nRequested ALAutonomousLife/set_state_srv", "WARNING"))
+        print(consoleFormatter.format("\nRequested ALAutonomousLife/set_state_srv", "WARNING"))
         self.ALAutonomousLife.setAutonomousAbilityEnabled("All", req.data)
         if req.data:
             self.ALAutonomousLife.setState("interactive")
@@ -127,7 +127,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALRobotPosture/go_to_posture_srv", "WARNING"))
         if req.posture == "stand":
             self.ALRobotPosture.goToPosture("Stand", 0.5)
-	    print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
+            print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         elif req.posture == "rest":
             self.ALRobotPosture.goToPosture("Crouch", 0.5)
             print(consoleFormatter.format('Robot is in rest position!', 'OKGREEN'))
@@ -184,7 +184,7 @@ class PyToolkit:
             var form = document.createElement("form");
 
             var label = document.createElement("label");
-            label.textContent = "Enter your message: ";
+            label.textContent = "{text}";
 
             var textbox = document.createElement("input");
             textbox.id = "input_id";
@@ -193,8 +193,7 @@ class PyToolkit:
             var sendButton = document.createElement("input");
             sendButton.type = "button";
             sendButton.value = "Submit";
-	    sendButton.onclick = function(){var input = document.getElementById("input_id").value;
-	    ALTabletBinding.raiseEvent(input);};
+	        sendButton.onclick = function(){codigo};
             form.appendChild(label);
             form.appendChild(textbox);
             form.appendChild(sendButton);
@@ -202,7 +201,7 @@ class PyToolkit:
             var container = document.getElementById("container");
 
             container.appendChild(form);
-            """
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="list":
             script="""
             """
