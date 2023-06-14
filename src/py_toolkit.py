@@ -6,7 +6,7 @@ import time
 import rospy
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
 
@@ -17,10 +17,16 @@ class PyToolkit:
 
     def __init__(self, session):
         # Service Naoqi Clients
+        self.ALAudioDevice = session.service("ALAudioDevice")
         self.ALAutonomousLife = session.service("ALAutonomousLife")
         self.ALBasicAwareness = session.service("ALBasicAwareness")
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
+
+        
+        # Service ROS Servers - ALAudioDevice
+        self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
+        print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALAutonomousLife
@@ -54,6 +60,15 @@ class PyToolkit:
     # -----------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------------SERVICES CALLBACKS-------------------------------------------------
     # -----------------------------------------------------------------------------------------------------------------------
+
+    # ----------------------------------------------------ALAudioDevice------------------------------------------------------
+
+    def callback_audio_device_set_output_volume_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALAudioDevice/set_output_volume_srv", "WARNING"))
+        self.ALAudioDevice.setOutputVolume(req.volume)
+        print(consoleFormatter.format('Volume set to ' + str(req.volume), 'OKGREEN'))
+        return set_output_volume_srvResponse("OK")
+
     
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
 
