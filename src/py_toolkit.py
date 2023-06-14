@@ -88,7 +88,7 @@ class PyToolkit:
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
 
     def callback_autonomous_set_state_srv(self, req):
-        print(consoleFormatter.format("\nRequested ALAutonomousLife/set_state_srv", "WARNING"))
+	print(consoleFormatter.format("\nRequested ALAutonomousLife/set_state_srv", "WARNING"))
         self.ALAutonomousLife.setAutonomousAbilityEnabled("All", req.data)
         if req.data:
             self.ALAutonomousLife.setState("interactive")
@@ -127,7 +127,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALRobotPosture/go_to_posture_srv", "WARNING"))
         if req.posture == "stand":
             self.ALRobotPosture.goToPosture("Stand", 0.5)
-            print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
+	    print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         elif req.posture == "rest":
             self.ALRobotPosture.goToPosture("Crouch", 0.5)
             print(consoleFormatter.format('Robot is in rest position!', 'OKGREEN'))
@@ -193,9 +193,8 @@ class PyToolkit:
             var sendButton = document.createElement("input");
             sendButton.type = "button";
             sendButton.value = "Submit";
-            sendButton.onClick = {()=>{
-                var input = document.getElementById('input_id').value;
-                ALTabletBinding.raiseEvent(input)}};
+	    sendButton.onclick = function(){var input = document.getElementById("input_id").value;
+	    ALTabletBinding.raiseEvent(input);};
             form.appendChild(label);
             form.appendChild(textbox);
             form.appendChild(sendButton);
@@ -208,7 +207,7 @@ class PyToolkit:
             script="""
             """
         signalID = 0
-        signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+        signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
         time.sleep(10)
         try:
