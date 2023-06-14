@@ -6,7 +6,11 @@ import time
 import rospy
 import argparse
 import sys
+<<<<<<< HEAD
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse
+=======
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, get_input_srv
+>>>>>>> 0f7e879f5458f4f89bfc88b3abf0a294e97a2abb
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
 
@@ -56,11 +60,19 @@ class PyToolkit:
         self.tabletShowWebViewServer = rospy.Service('pytoolkit/ALTabletService/show_web_view_srv', tablet_service_srv, self.callback_tablet_show_web_view_srv)
         print(consoleFormatter.format('Show_web_view_srv on!', 'OKGREEN'))    
 
+        self.tabletShowTopicServer = rospy.Service('pytoolkit/ALTabletService/show_topic_srv', tablet_service_srv, self.callback_tablet_topic_srv)
+        print(consoleFormatter.format('Show_topic_srv on!', 'OKGREEN')) 
+
         self.tabletPlayVideoServer = rospy.Service('pytoolkit/ALTabletService/play_video_srv', tablet_service_srv, self.callback_tablet_play_video_srv)
         print(consoleFormatter.format('Play_video_srv on!', 'OKGREEN'))    
 
+        self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/get_input_srv', get_input_srv, self.callback_tablet_get_input_srv)
+        print(consoleFormatter.format('Get_input_srv on!', 'OKGREEN'))  
+
         self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', Empty, self.callback_tablet_hide_srv)
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
+
+        self.input=""
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -139,6 +151,71 @@ class PyToolkit:
         self.ALTabletService.showWebview(req.url)
         print(consoleFormatter.format('Web view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
+
+    def callback_tablet_topic_view_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
+        self.ALTabletService.showWebview("http://192.168.0.199:8080/stream_viewer?topic="+req.url)
+        time.sleep(3)
+        script="""
+        var img = document.querySelector("img");
+        img.style.width = "1280px";
+        var heading = document.querySelector("h1");
+        heading.innerHTML = "";
+        """
+        self.ALTabletService.executeJS(script)
+        print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
+        return tablet_service_srvResponse("OK")
+
+
+    def getInput(self,event):
+        self.input=event
+
+    def callback_tablet_get_input_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
+        self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/index2.html")
+        time.sleep(3)
+        #text es un textbox donde la persona ingresa informacion
+        #bool son 2 botones de yes no
+        #list es una lista de opciones de la que elige el usuario
+        if req.type=="text":
+            script="""
+            function publish(){
+                var input = document.getElementById('input_id').value;
+                ALTabletBinding.raiseEvent(input);
+            }
+
+            var form = document.createElement("form");
+
+            var label = document.createElement("label");
+            label.textContent = "Enter your message: ";
+
+            var textbox = document.createElement("input");
+            textbox.id = "input_id";
+            textbox.type = "text";
+
+            var sendButton = document.createElement("input");
+            sendButton.type = "button";
+            sendButton.value = "Submit";
+            sendButton.onclick = "publish()";
+
+            form.appendChild(label);
+            form.appendChild(textbox);
+            form.appendChild(sendButton);
+
+            var container = document.getElementById("container");
+
+            container.appendChild(form);
+            """
+        elif req.type=="bool":
+            script="""
+            """
+        elif req.type=="list":
+            script="""
+            """
+        signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+        self.ALTabletService.executeJS(script)
+        print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
+        return self.input
     
 
     def callback_tablet_play_video_srv(self, req):
