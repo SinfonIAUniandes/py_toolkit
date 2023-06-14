@@ -69,6 +69,7 @@ class PyToolkit:
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
 
         self.input=""
+	self.promise=qi.Promise()
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -165,44 +166,19 @@ class PyToolkit:
 
     def getInput(self,event):
         self.input=event
-        promise.setValue(True)
+        self.promise.setValue(True)
 
     def callback_tablet_get_input_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
         self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/index2.html")
-        time.sleep(3)
+        time.sleep(1)
         #text es un textbox donde la persona ingresa informacion
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
             script="""
-            function publish(){
-                var input = document.getElementById('input_id').value;
-                ALTabletBinding.raiseEvent(input);
-            }
-
-            var form = document.createElement("form");
-
-            var label = document.createElement("label");
-            label.textContent = "Enter your message: ";
-
-            var textbox = document.createElement("input");
-            textbox.id = "input_id";
-            textbox.type = "text";
-
-            var sendButton = document.createElement("input");
-            sendButton.type = "button";
-            sendButton.value = "Submit";
-            sendButton.onclick = "publish()";
-
-            form.appendChild(label);
-            form.appendChild(textbox);
-            form.appendChild(sendButton);
-
-            var container = document.getElementById("container");
-
-            container.appendChild(form);
-            """
+	    var name = prompt("{text}");
+	    ALTabletBinding.raiseEvent(name);""".format(text=req.text)
         elif req.type=="bool":
             script="""
             """
@@ -210,16 +186,17 @@ class PyToolkit:
             script="""
             """
         signalID = 0
-        promise = qi.Promise()
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+	self.ALTabletService.executeJS(script)
+	time.sleep(10)
         try:
-            promise.future().hasValue(30000)
+            self.promise.future().hasValue(3000)
         except RuntimeError:
             raise RuntimeError('Timeout: no signal triggered')
-        self.ALTabletService.executeJS(script)
         self.ALTabletService.onJSEvent.disconnect(signalID)
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
-        return self.input
+	self.promise=qi.Promise()
+	return self.input
     
 
     def callback_tablet_play_video_srv(self, req):
