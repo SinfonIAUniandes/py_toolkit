@@ -20,7 +20,7 @@ class PyToolkit:
         self.ALAudioDevice = session.service("ALAudioDevice")
         self.ALAutonomousLife = session.service("ALAutonomousLife")
         self.ALBasicAwareness = session.service("ALBasicAwareness")
-        self.ALMotion = self.session.service("ALMotion")
+        self.ALMotion = session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
 
@@ -148,7 +148,7 @@ class PyToolkit:
         print(consoleFormatter.format('Web view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
-    def callback_tablet_topic_view_srv(self, req):
+    def callback_tablet_topic_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
         self.ALTabletService.showWebview("http://192.168.0.199:8080/stream_viewer?topic="+req.url)
         time.sleep(3)
