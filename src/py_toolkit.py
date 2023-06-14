@@ -177,10 +177,6 @@ class PyToolkit:
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
             script="""
-	    var name = prompt("{text}");
-	    ALTabletBinding.raiseEvent(name);""".format(text=req.text)
-        elif req.type=="bool":
-            script="""
             var form = document.createElement("form");
 
             var label = document.createElement("label");
@@ -189,6 +185,35 @@ class PyToolkit:
             var textbox = document.createElement("input");
             textbox.id = "input_id";
             textbox.type = "text";
+
+            var sendButton = document.createElement("input");
+            sendButton.type = "button";
+            sendButton.value = "Submit";
+	        sendButton.onclick = function(){codigo};
+            form.appendChild(label);
+            form.appendChild(textbox);
+            form.appendChild(sendButton);
+
+            var container = document.getElementById("container");
+
+            container.appendChild(form);
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
+        elif req.type=="bool":
+            script="""
+            var form = document.createElement("form");
+
+            var label = document.createElement("label");
+            label.textContent = "Choose an Element from list:";
+
+            var textbox = document.createElement("input");
+            textbox.id = "input_id";
+            var array = {text}.split(",")
+            for (var i = 0; i<array.length; i++)
+            {
+                var opt = document.createElement('option');
+                opt.value = array[i];
+                textbox.appendChild(opt);
+            }
 
             var sendButton = document.createElement("input");
             sendButton.type = "button";
