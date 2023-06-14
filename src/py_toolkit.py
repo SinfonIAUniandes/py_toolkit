@@ -6,7 +6,7 @@ import time
 import rospy
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
 
@@ -20,6 +20,7 @@ class PyToolkit:
         self.ALAudioDevice = session.service("ALAudioDevice")
         self.ALAutonomousLife = session.service("ALAutonomousLife")
         self.ALBasicAwareness = session.service("ALBasicAwareness")
+        self.ALMotion = self.session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
 
@@ -36,7 +37,12 @@ class PyToolkit:
 
         # Service ROS Servers - ALBasicAwareness
         self.awarenessSetAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/set_awareness_srv', SetBool, self.callback_awareness_set_awareness_srv)
-        print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))    
+        print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
+
+        
+        # Service ROS Servers - ALMotion
+        self.motionSetSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_security_distance_srv', set_security_distance_srv, self.callback_motion_set_security_distance_srv)    
+        print(consoleFormatter.format('Set_security_distance_srv on!', 'OKGREEN'))
 
         
         # Service ROS Servers - ALRobotPosture
@@ -95,6 +101,16 @@ class PyToolkit:
             self.ALBasicAwareness.pauseAwareness()
             print(consoleFormatter.format('Awareness is off!', 'OKGREEN'))
         return SetBoolResponse(True, "OK")
+
+    # ----------------------------------------------------ALMotion------------------------------------------------
+
+    def callback_motion_set_security_distance_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_security_distance_srv", "WARNING"))
+        self.ALMotion.setOrthogonalSecurityDistance(req.distance)
+        self.ALMotion.setTangentialSecurityDistance(req.distance)
+        print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
+        return set_security_distance_srvResponse("OK")
+
 
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
     
