@@ -69,7 +69,7 @@ class PyToolkit:
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
 
         self.input=""
-	self.promise=qi.Promise()
+        self.promise=qi.Promise()
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -181,22 +181,44 @@ class PyToolkit:
 	    ALTabletBinding.raiseEvent(name);""".format(text=req.text)
         elif req.type=="bool":
             script="""
+            var form = document.createElement("form");
+
+            var label = document.createElement("label");
+            label.textContent = "Enter your message: ";
+
+            var textbox = document.createElement("input");
+            textbox.id = "input_id";
+            textbox.type = "text";
+
+            var sendButton = document.createElement("input");
+            sendButton.type = "button";
+            sendButton.value = "Submit";
+            sendButton.onClick = {()=>{
+                var input = document.getElementById('input_id').value;
+                ALTabletBinding.raiseEvent(input)}};
+            form.appendChild(label);
+            form.appendChild(textbox);
+            form.appendChild(sendButton);
+
+            var container = document.getElementById("container");
+
+            container.appendChild(form);
             """
         elif req.type=="list":
             script="""
             """
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
-	self.ALTabletService.executeJS(script)
-	time.sleep(10)
+        self.ALTabletService.executeJS(script)
+        time.sleep(10)
         try:
             self.promise.future().hasValue(3000)
         except RuntimeError:
             raise RuntimeError('Timeout: no signal triggered')
         self.ALTabletService.onJSEvent.disconnect(signalID)
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
-	self.promise=qi.Promise()
-	return self.input
+        self.promise=qi.Promise()
+        return self.input
     
 
     def callback_tablet_play_video_srv(self, req):
