@@ -27,6 +27,7 @@ class PyToolkit:
 
         self.ALMemory = session.service("ALMemory")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
+        self.ALSpeechRecognitionService.subscribe("potato")
         self.ALSpeechRecognitionService.setAudioExpression(False)
         
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
