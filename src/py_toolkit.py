@@ -217,6 +217,7 @@ class PyToolkit:
             container.appendChild(form);
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="bool":
+            
             script="""
             var form = document.createElement("form");
 
@@ -240,6 +241,28 @@ class PyToolkit:
 
             container.appendChild(form);
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="")#,codigo2="for (var i = 0; i<array.length; i++)\n var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);")
+            script="""
+            var form = document.createElement("form");
+
+            var label = document.createElement("label");
+            label.textContent = "{text}";
+
+            var textbox = document.createElement("input");
+            textbox.id = "input_id";
+            textbox.type = "text";
+
+            var sendButton = document.createElement("input");
+            sendButton.type = "button";
+            sendButton.value = "Submit";
+	        sendButton.onclick = function(){codigo};
+            form.appendChild(label);
+            form.appendChild(textbox);
+            form.appendChild(sendButton);
+
+            var container = document.getElementById("container");
+
+            container.appendChild(form);
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="list":
             script="""
             """
