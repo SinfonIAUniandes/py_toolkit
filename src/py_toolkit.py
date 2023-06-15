@@ -195,10 +195,8 @@ class PyToolkit:
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
             script="""
-            var label = document.getElementById("myLabel");
-            label.textContent = "{text}";
-
             var sendButton = document.getElementById("input");
+            sendButton.textContent = "{text}";
             """.format(text=req.text)#,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
