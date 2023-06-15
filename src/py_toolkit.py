@@ -188,7 +188,6 @@ class PyToolkit:
 
     def callback_tablet_get_input_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
-        time.sleep(1)
         #text es un textbox donde la persona ingresa informacion
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
@@ -242,6 +241,7 @@ class PyToolkit:
             sendButton.value = "Submit";
 	        sendButton.onclick = function(){codigo};
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);")
+        time.sleep(1)
         print(script)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
