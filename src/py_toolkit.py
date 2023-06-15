@@ -226,11 +226,12 @@ class PyToolkit:
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
+            #Si el req.text no esta separado por comas tira error
             script="""
 
             var textbox = document.getElementById('input_id');
 
-            var array = {text}.split(",");
+            var array = "{text}".split(",");
             prompt("banana");
             for (var i = 0; i<array.length; i++)
             {codigo2}
