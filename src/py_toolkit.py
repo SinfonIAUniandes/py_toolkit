@@ -7,6 +7,7 @@ import rospy
 import argparse
 import sys
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv
+from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
 
@@ -16,6 +17,22 @@ class PyToolkit:
     # -----------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, session):
+
+        # Publishers
+        self.ALTextToSpeechStatusPublisher = rospy.Publisher('/pytoolkit/ALTextToSpeech/status', text_to_speech_status_msg, queue_size=10)
+        print(consoleFormatter.format("ALTextToSpeech/status topic is up!","OKGREEN"))
+
+        self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
+        print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
+
+        self.ALMemory = session.service("ALMemory")
+        
+        self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
+        self.ALTextToSpeechStatusSubscriber.signal.connect(self.on_tts_status)
+
+        self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
+        self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
+
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
         self.ALAutonomousLife = session.service("ALAutonomousLife")
@@ -252,6 +269,18 @@ class PyToolkit:
         self.ALTabletService.hide()
         print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
         return
+    
+    # -----------------------------------------------------------------------------------------------------------------------
+    # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------------------------
+
+    def on_tts_status(self, value):
+        idOfConcernedTask, status = value
+        self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(idOfConcernedTask, status))
+
+    def on_speech_recognition_status(self, value):
+        status = value
+        self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
 
 if __name__ == '__main__':
