@@ -188,84 +188,40 @@ class PyToolkit:
 
     def callback_tablet_get_input_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
-        self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/index2.html")
         time.sleep(1)
         #text es un textbox donde la persona ingresa informacion
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
             script="""
-            var form = document.createElement("form");
+            var label = document.getElementById("label");
+            label.textContent = "{text}";
 
-            var label = document.createElement("label");
+            var sendButton = document.getElementById("input");
+	        sendButton.onclick = function(){codigo};
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
+        elif req.type=="bool":
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
+            script="""
+            """
+        elif req.type=="list":
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
+            script="""
+            var label = document.getElementById("label");
             label.textContent = "{text}";
 
             var textbox = document.createElement("input");
             textbox.id = "input_id";
-            textbox.type = "text";
-
-            var sendButton = document.createElement("input");
-            sendButton.type = "button";
-            sendButton.value = "Submit";
-	        sendButton.onclick = function(){codigo};
-            form.appendChild(label);
-            form.appendChild(textbox);
-            form.appendChild(sendButton);
-
-            var container = document.getElementById("container");
-
-            container.appendChild(form);
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
-        elif req.type=="bool":
-            
-            script="""
-            var form = document.createElement("form");
-
-            var label = document.createElement("label");
-            label.textContent = "Choose an Element from list:";
-
-            var textbox = document.createElement("input");
-            textbox.id = "input_id";
             var array = {text}.split(",");
+            for (var i = 0; i<array.length; i++)
             {codigo2}
 
             var sendButton = document.createElement("input");
             sendButton.type = "button";
             sendButton.value = "Submit";
 	        sendButton.onclick = function(){codigo};
-            form.appendChild(label);
-            form.appendChild(textbox);
-            form.appendChild(sendButton);
-
-            var container = document.getElementById("container");
-
-            container.appendChild(form);
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="")#,codigo2="for (var i = 0; i<array.length; i++)\n var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);")
-            script="""
-            var form = document.createElement("form");
-
-            var label = document.createElement("label");
-            label.textContent = "{text}";
-
-            var textbox = document.createElement("input");
-            textbox.id = "input_id";
-            textbox.type = "text";
-
-            var sendButton = document.createElement("input");
-            sendButton.type = "button";
-            sendButton.value = "Submit";
-	        sendButton.onclick = function(){codigo};
-            form.appendChild(label);
-            form.appendChild(textbox);
-            form.appendChild(sendButton);
-
-            var container = document.getElementById("container");
-
-            container.appendChild(form);
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
-        elif req.type=="list":
-            script="""
-            """
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);")
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
