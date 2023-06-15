@@ -228,6 +228,7 @@ class PyToolkit:
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             script="""
 
+            prompt("banana");
             var textbox = document.getElementById('input_id');
 
             var array = {text}.split(",");
