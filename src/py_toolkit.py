@@ -187,6 +187,7 @@ class PyToolkit:
         self.promise.setValue(True)
 
     def callback_tablet_get_input_srv(self, req):
+        self.input=""
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
         #text es un textbox donde la persona ingresa informacion
         #bool son 2 botones de yes no
@@ -239,11 +240,12 @@ class PyToolkit:
 	        sendButton.onclick = function(){codigo};
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
         time.sleep(1)
-        print(script)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
-        time.sleep(10)
+        while self.input=="":
+            time.sleep(1)
+        self.ALTabletService.hide()
         try:
             self.promise.future().hasValue(3000)
         except RuntimeError:
