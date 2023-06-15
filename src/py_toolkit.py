@@ -26,7 +26,7 @@ class PyToolkit:
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
 
         self.ALMemory = session.service("ALMemory")
-        self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
+        self.ALSpeechRecognitionService = session.service("ALSpeechRecognition").subscribe
         self.ALSpeechRecognitionService.setAudioExpression(False)
         
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
