@@ -228,7 +228,6 @@ class PyToolkit:
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             script="""
 
-            prompt("banana");
             var textbox = document.getElementById('input_id');
 
             var array = {text}.split(",");
@@ -237,6 +236,7 @@ class PyToolkit:
 
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
+            prompt("banana");
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);}")
         time.sleep(1)
         print(script)
