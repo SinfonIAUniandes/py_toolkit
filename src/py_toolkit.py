@@ -33,6 +33,9 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
 
+        self.ALSpeechRecognitionRunningSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/IsRunning")
+        self.ALSpeechRecognitionRunningSubscriber.signal.connect(self.on_speech_recognition_start)
+
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
         self.ALAutonomousLife = session.service("ALAutonomousLife")
@@ -279,6 +282,10 @@ class PyToolkit:
         self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(idOfConcernedTask, status))
 
     def on_speech_recognition_status(self, value):
+        status = value
+        self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
+
+    def on_speech_recognition_start(self, value):
         status = value
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
