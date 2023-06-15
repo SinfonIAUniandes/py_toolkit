@@ -286,7 +286,7 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
     def on_speech_recognition_start(self, value):
-        status = value
+        status = str(value)
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
 
