@@ -29,6 +29,7 @@ class PyToolkit:
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALSpeechRecognitionService.subscribe("potato")
         self.ALSpeechRecognitionService.setAudioExpression(False)
+        self.ALSpeechRecognitionService.setVisualExpression(False)
         
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
         self.ALTextToSpeechStatusSubscriber.signal.connect(self.on_tts_status)
