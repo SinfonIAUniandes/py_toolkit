@@ -41,6 +41,7 @@ class PyToolkit:
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
+        self.ALSpeechRecognitionService.pause(False)
         self.ALSpeechRecognitionService.setAudioExpression(False)
         
         # Service ROS Servers - ALAudioDevice
