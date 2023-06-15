@@ -30,7 +30,7 @@ class PyToolkit:
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
         self.ALTextToSpeechStatusSubscriber.signal.connect(self.on_tts_status)
 
-        self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/SpeechDetected")
+        self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
 
         # Service Naoqi Clients
@@ -40,6 +40,7 @@ class PyToolkit:
         self.ALMotion = session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
+        self.ALSpeechRecognitionService = session.service("ALSpeechRecognition").subscribe()
 
         
         # Service ROS Servers - ALAudioDevice
@@ -279,7 +280,7 @@ class PyToolkit:
         self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(idOfConcernedTask, status))
 
     def on_speech_recognition_status(self, value):
-        status = str(value)
+        status = value
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
 
