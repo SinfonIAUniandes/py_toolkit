@@ -195,9 +195,12 @@ class PyToolkit:
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
             script="""
-            var sendButton = document.getElementById("input");
-            sendButton.textContent = "{text}";
-            """.format(text=req.text)#,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
+            var label = document.getElementById("myLabel");
+            label.textContent = "{text}";
+
+            var sendButton = document.getElementById("sendB");
+	        sendButton.onclick = function(){codigo};
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
@@ -205,16 +208,16 @@ class PyToolkit:
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             script="""
-            var label = document.getElementById("myLabel");
+            var label = document.getElementById("text");
             label.textContent = "{text}";
 
-            var textbox = document.createElement("input");
+            var textbox = document.createElement("myLabel");
             textbox.id = "input_id";
             var array = {text}.split(",");
             for (var i = 0; i<array.length; i++)
             {codigo2}
 
-            var sendButton = document.createElement("input");
+            var sendButton = document.createElement("sendB");
             sendButton.type = "button";
             sendButton.value = "Submit";
 	        sendButton.onclick = function(){codigo};
