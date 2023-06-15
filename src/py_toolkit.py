@@ -232,13 +232,12 @@ class PyToolkit:
             var textbox = document.getElementById('input_id');
 
             var array = "{text}".split(",");
-            prompt("banana");
             for (var i = 0; i<array.length; i++)
             {codigo2}
 
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);}")
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
         time.sleep(1)
         print(script)
         signalID = 0
