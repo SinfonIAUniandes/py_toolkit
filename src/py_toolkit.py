@@ -195,11 +195,12 @@ class PyToolkit:
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
             script="""
-            var label = document.getElementById("label");
+            var label = document.getElementById("text");
             label.textContent = "{text}";
 
             var sendButton = document.getElementById("input");
-            """.format(text=req.text)
+	        sendButton.onclick = function(){codigo};
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
@@ -207,7 +208,7 @@ class PyToolkit:
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             script="""
-            var label = document.getElementById("label");
+            var label = document.getElementById("text");
             label.textContent = "{text}";
 
             var textbox = document.createElement("input");
@@ -221,7 +222,6 @@ class PyToolkit:
             sendButton.value = "Submit";
 	        sendButton.onclick = function(){codigo};
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);")
-        print(script)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
