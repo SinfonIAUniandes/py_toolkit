@@ -229,9 +229,9 @@ class PyToolkit:
             script="""
 
             var textbox = document.getElementById('input_id');
-            prompt("banana");
 
             var array = {text}.split(",");
+            prompt("banana");
             for (var i = 0; i<array.length; i++)
             {codigo2}
 
