@@ -227,20 +227,16 @@ class PyToolkit:
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             script="""
-            var label = document.getElementById("text");
-            label.textContent = "{text}";
 
-            var textbox = document.createElement("myLabel");
-            textbox.id = "input_id";
+            var textbox = document.getElementById('input_id');
+
             var array = {text}.split(",");
             for (var i = 0; i<array.length; i++)
             {codigo2}
 
-            var sendButton = document.createElement("sendB");
-            sendButton.type = "button";
-            sendButton.value = "Submit";
+            var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);")
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\ntextbox.appendChild(opt);}")
         time.sleep(1)
         print(script)
         signalID = 0
