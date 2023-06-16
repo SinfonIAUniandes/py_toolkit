@@ -204,29 +204,17 @@ class PyToolkit:
 	        sendButton.onclick = function(){codigo};
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="bool":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/index2.html")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
-            var form = document.createElement("form");
-
-            var label = document.createElement("label");
+            var label = document.getElementById("myLabel");
             label.textContent = "{text}";
 
-            var textbox = document.createElement("input");
-            textbox.id = "input_id";
-            textbox.type = "text";
+            var yesButton = document.getElementById("yesB");
+	        yesButton.onclick = function(){codigo};
 
-            var sendButton = document.createElement("input");
-            sendButton.type = "button";
-            sendButton.value = "Submit";
-	        sendButton.onclick = function(){codigo};
-            form.appendChild(label);
-            form.appendChild(textbox);
-            form.appendChild(sendButton);
-
-            var container = document.getElementById("container");
-
-            container.appendChild(form);
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
+            var noButton = document.getElementById("noB");
+	        noButton.onclick = function2(){codigo2};
+            """.format(text=req.text,codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
