@@ -6,7 +6,7 @@ import time
 import rospy
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -45,6 +45,9 @@ class PyToolkit:
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
+        print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
+
+        self.audioHearingServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_speechrecognition_srv', set_speechrecognition_srv, self.callback_set_speechrecognition_srv)
         print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
 
 
@@ -88,8 +91,6 @@ class PyToolkit:
 
         self.input=""
         self.promise=qi.Promise()
-
-        self.callback_tablet_wakeUp_srv()
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -165,10 +166,6 @@ class PyToolkit:
 
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
-    def callback_tablet_wakeUp_srv(self):
-        self.ALTabletService.wakeUp()
-        return "OK"
-
     def callback_tablet_show_image_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
         self.ALTabletService.showImage(req.url)
@@ -228,15 +225,7 @@ class PyToolkit:
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
-            script="""
-
-            var textbox = document.getElementById('input_id');
-
-            var array = "{text}".split(",");
-            for (var i = 0; i<array.length; i++)
-            {codigo2}
-
-            var sendButton = document.getElementById("sendB");
+            script="""tablet
 	        sendButton.onclick = function(){codigo};
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
         time.sleep(1)
