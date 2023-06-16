@@ -114,7 +114,7 @@ class PyToolkit:
             self.ALSpeechRecognitionService.unsubscribe("isHearing")
         self.ALSpeechRecognitionService.setAudioExpression(req.noise)
         self.ALSpeechRecognitionService.setVisualExpression(req.eyes)
-        return set_speechrecognition_srv("OK")
+        return "OK"
 
     
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
