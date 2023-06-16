@@ -208,7 +208,6 @@ class PyToolkit:
             script="""
             var label = document.getElementById("myLabel");
             label.textContent = "{text}";
-            prompt("banana");
             var yesButton = document.getElementById("yesB");
 	        yesButton.onclick = function(){codigo};
             var noButton = document.getElementById("noB");
@@ -228,6 +227,7 @@ class PyToolkit:
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
+        print(script)
         time.sleep(1)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
