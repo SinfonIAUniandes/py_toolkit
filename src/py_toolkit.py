@@ -206,13 +206,11 @@ class PyToolkit:
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
-            var label = document.getElementById("myLabel");
-            label.textContent = "{text}";
             var yesButton = document.getElementById("yesB");
 	        yesButton.onclick = function(){codigo};
             var noButton = document.getElementById("noB");
 	        noButton.onclick = function2(){codigo2};
-            """.format(text=req.text,codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
+            """.format(codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
