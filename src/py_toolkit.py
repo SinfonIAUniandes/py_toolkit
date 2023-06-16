@@ -206,11 +206,11 @@ class PyToolkit:
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
-            prompt("banana");
+            
             var yesButton = document.getElementById("yesB");
 	        yesButton.onclick = function(){codigo};
             var noButton = document.getElementById("noB");
-	        noButton.onclick = function2(){codigo2};
+	        noButton.onclick = function(){codigo2};
             """.format(codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
@@ -255,7 +255,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTabletService/hide_srv", "WARNING"))
         self.ALTabletService.hide()
         print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
-        return
+        return "Aproved"
     
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
