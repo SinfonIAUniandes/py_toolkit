@@ -208,10 +208,9 @@ class PyToolkit:
             script="""
             var label = document.getElementById("myLabel");
             label.textContent = "{text}";
-
+            prompt("banana");
             var yesButton = document.getElementById("yesB");
 	        yesButton.onclick = function(){codigo};
-
             var noButton = document.getElementById("noB");
 	        noButton.onclick = function2(){codigo2};
             """.format(text=req.text,codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
