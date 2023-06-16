@@ -19,6 +19,7 @@ class PyToolkit:
     def __init__(self, session):
 
         # Publishers
+
         self.ALTextToSpeechStatusPublisher = rospy.Publisher('/pytoolkit/ALTextToSpeech/status', text_to_speech_status_msg, queue_size=10)
         print(consoleFormatter.format("ALTextToSpeech/status topic is up!","OKGREEN"))
 
@@ -26,10 +27,6 @@ class PyToolkit:
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
 
         self.ALMemory = session.service("ALMemory")
-        self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
-        self.ALSpeechRecognitionService.subscribe("potato")
-        self.ALSpeechRecognitionService.setAudioExpression(False)
-        self.ALSpeechRecognitionService.setVisualExpression(False)
         
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
         self.ALTextToSpeechStatusSubscriber.signal.connect(self.on_tts_status)
@@ -44,6 +41,7 @@ class PyToolkit:
         self.ALMotion = session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
+        self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -91,18 +89,30 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()
 
+        self.callback_tablet_wakeUp_srv()
+
 
     # -----------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------------SERVICES CALLBACKS-------------------------------------------------
     # -----------------------------------------------------------------------------------------------------------------------
 
-    # ----------------------------------------------------ALAudioDevice------------------------------------------------------
+    # ----------------------------------------------------ALSpeechRecognition------------------------------------------------------
 
     def callback_audio_device_set_output_volume_srv(self, req):
         print(consoleFormatter.format("\nRequested ALAudioDevice/set_output_volume_srv", "WARNING"))
         self.ALAudioDevice.setOutputVolume(req.volume)
         print(consoleFormatter.format('Volume set to ' + str(req.volume), 'OKGREEN'))
         return set_output_volume_srvResponse("OK")
+
+    # ----------------------------------------------------ALAudioDevice------------------------------------------------------
+
+    def callback_set_speechrecognition_srv(self, req):
+        if req.subscribe:
+            self.ALSpeechRecognitionService.subscribe("isHearing")
+        else:
+            self.ALSpeechRecognitionService.unsubscribe("isHearing")
+        self.ALSpeechRecognitionService.setAudioExpression(req.noise)
+        self.ALSpeechRecognitionService.setVisualExpression(req.eyes)
 
     
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
@@ -155,6 +165,9 @@ class PyToolkit:
 
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
+    def callback_tablet_wakeUp_srv(self):
+        self.ALTabletService.wakeUp()
+        return "OK"
 
     def callback_tablet_show_image_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
@@ -226,7 +239,6 @@ class PyToolkit:
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
-        print(script)
         time.sleep(1)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
