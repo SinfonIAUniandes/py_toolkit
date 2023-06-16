@@ -206,6 +206,7 @@ class PyToolkit:
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
+            prompt("banana");
             var yesButton = document.getElementById("yesB");
 	        yesButton.onclick = function(){codigo};
             var noButton = document.getElementById("noB");
