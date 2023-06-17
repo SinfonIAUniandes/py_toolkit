@@ -192,7 +192,7 @@ class PyToolkit:
         self.ALTabletService.showWebview("http://192.168.0.199:8080/stream_viewer?topic="+req.url)
         time.sleep(1)
         script="""
-        var body = document.querySelector("body")
+        var body = document.querySelector("body");
         body.style.margin = "0";
         body.style.display = "flex";
         body.style.justify-content= "center";
