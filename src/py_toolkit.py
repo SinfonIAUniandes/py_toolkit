@@ -276,9 +276,9 @@ class PyToolkit:
         return None
 
     def callback_tablet_overload_srv(self, req):
-        for i in range(4):
+        for i in range(3):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
-            time.sleep(0.7)
+            time.sleep(1)
         pytoolkit.ALTabletService.hide()
         return None
     
@@ -323,9 +323,9 @@ if __name__ == '__main__':
         pytoolkit.ALBasicAwareness.resumeAwareness()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         print("overloading tablet...")
-        for i in range(4):
+        for i in range(3):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
-            time.sleep(0.7)
+            time.sleep(1)
         pytoolkit.ALTabletService.hide()
         time.sleep(1)
         pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
