@@ -306,16 +306,16 @@ if __name__ == '__main__':
     try:
         pytoolkit.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
         pytoolkit.ALAutonomousLife.setState("disabled")
-        pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
         if not pytoolkit.ALBasicAwareness.isEnabled():
             pytoolkit.ALBasicAwareness.setEnabled(True)
         pytoolkit.ALBasicAwareness.resumeAwareness()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
 
         for i in range(8):
-            pytoolkit.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
+            pytoolkit.ALTabletService.loadApplication("webdisplay")
             print("overloading: " +"#"*i)
             time.sleep(5)
+        pytoolkit.ALTabletService.hide()
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
         print(consoleFormatter.format(" --------- PyToolkit node successfully initialized --------- ", "OKGREEN"))
         print(consoleFormatter.format(" ----------------------------------------------------------\n", "OKGREEN")) 
