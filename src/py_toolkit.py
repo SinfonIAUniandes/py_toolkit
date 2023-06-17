@@ -219,21 +219,21 @@ class PyToolkit:
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
+            enter = """
+            document.getElementById("input_id").addEventListener("keyup", function(event) {
+                event.preventDefault();
+                if (event.keyCode === 13) {
+                    sendButton.click();
+                }
+            });
+            """
             script="""
             var label = document.getElementById("myLabel");
             label.textContent = "{text}";
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
-            document.getElementById("input_id")
-                .addEventListener("keyup", function(event) \{
-                event.preventDefault();
-                alert(event.keyCode);
-                if (event.keyCode === 13) \{
-                    sendButton.click();
-                \}
-            \});
-
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
+            {enter_code}            
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}", enter_code =enter)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
