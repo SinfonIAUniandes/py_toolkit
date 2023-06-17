@@ -96,7 +96,8 @@ class PyToolkit:
 
         self.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
         self.ALAutonomousLife.setState("disabled")
-        self.callback_posture_go_to_posture_srv(go_to_posture_srvRequest("stand"))
+        self.ALRobotPosture.goToPosture("Stand", 0.5)
+        print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
 
         for _ in range(40):
             self.ALTabletService.showWebview("198.18.0.1/apps/robot-page/input1.html")
