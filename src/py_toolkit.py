@@ -227,14 +227,13 @@ class PyToolkit:
                 }
             });
             """
-            
             script="""
             var label = document.getElementById("myLabel");
             label.textContent = "{text}";
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
             {enter_code}            
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);\nprompt(document.activeElement.tagName);}", enter_code =enter)
+            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}", enter_code =enter)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
