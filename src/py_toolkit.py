@@ -194,7 +194,7 @@ class PyToolkit:
         script="""
         var body = document.querySelector("body");
         body.style.margin = "0";
-        body.style.background-color = "#161616";
+        body.style.backgroundColor = "#161616";
         var img = document.querySelector("img");
         img.style.height = "614px";
         img.style.margin = "0 auto";
