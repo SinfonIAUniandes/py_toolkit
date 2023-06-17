@@ -7,7 +7,7 @@ import rospy
 import argparse
 import sys
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv
-from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg
+from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
 
@@ -93,14 +93,6 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()
 
-
-        self.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
-        self.ALAutonomousLife.setState("disabled")
-        self.ALRobotPosture.goToPosture("Stand", 0.5)
-        print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
-
-        for _ in range(40):
-            self.ALTabletService.showWebview("198.18.0.1/apps/robot-page/input1.html")
             
 
 
@@ -315,6 +307,14 @@ if __name__ == '__main__':
         print(consoleFormatter.format(" --------- PyToolkit node successfully initialized --------- ", "OKGREEN"))
         print(consoleFormatter.format(" ----------------------------------------------------------\n", "OKGREEN")) 
         rospy.spin()
+
+        pytoolkit.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
+        pytoolkit.ALAutonomousLife.setState("disabled")
+        pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
+        print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
+
+        for _ in range(40):
+            pytoolkit.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
 
     except rospy.ROSInterruptException:
         pass
