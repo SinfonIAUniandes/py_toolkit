@@ -226,7 +226,17 @@ class PyToolkit:
                     sendButton.click();
                 }
             });
+            // Detect when the keyboard is opened or closed
+            window.addEventListener('resize', function() {
+            // Check if the virtual keyboard is visible
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                // Scroll the focused element into view
+                document.activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            });
+
             """
+            
             script="""
             var label = document.getElementById("myLabel");
             label.textContent = "{text}";
