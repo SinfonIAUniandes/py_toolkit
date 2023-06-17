@@ -191,13 +191,14 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
         self.ALTabletService.showWebview("http://192.168.0.199:8080/stream_viewer?topic="+req.url)
         time.sleep(3)
-        script="""
+        script = """
         var body = document.querySelector("body");
         body.style.margin = "0";
         body.style.backgroundColor = "#161616";
+        body.style.display = "flex";
+        body.style.justifyContent = "center";
         var img = document.querySelector("img");
         img.style.height = "614px";
-        img.style.margin = "0 auto";
         var heading = document.querySelector("h1");
         heading.innerHTML = "";
         """
@@ -205,7 +206,6 @@ class PyToolkit:
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
-        pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
 
     def getInput(self,event):
         self.input=event
