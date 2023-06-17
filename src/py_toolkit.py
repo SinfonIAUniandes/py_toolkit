@@ -315,7 +315,6 @@ if __name__ == '__main__':
         for i in range(40):
             pytoolkit.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
             time.sleep(1)
-            print('overloading: ' + '#'*i ,sep='\r')
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
         print(consoleFormatter.format(" --------- PyToolkit node successfully initialized --------- ", "OKGREEN"))
         print(consoleFormatter.format(" ----------------------------------------------------------\n", "OKGREEN")) 
