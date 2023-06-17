@@ -318,9 +318,11 @@ if __name__ == '__main__':
         if not pytoolkit.ALBasicAwareness.isEnabled():
             pytoolkit.ALBasicAwareness.setEnabled(True)
         pytoolkit.ALBasicAwareness.resumeAwareness()
+        pytoolkit.ALBasicAwareness.pauseAwareness()
+        pytoolkit.ALBasicAwareness.resumeAwareness()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         print("overloading tablet...")
-        for i in range(6):
+        for i in range(4):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1)
         pytoolkit.ALTabletService.hide()
