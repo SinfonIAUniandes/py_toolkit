@@ -190,10 +190,15 @@ class PyToolkit:
     def callback_tablet_topic_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
         self.ALTabletService.showWebview("http://192.168.0.199:8080/stream_viewer?topic="+req.url)
-        time.sleep(3)
+        time.sleep(1)
         script="""
+        var body = document.querySelector("body")
+        body.style.padding = "0";
+        body.style.width = "100vw";
+        body.style.display = "flex";
+        body.style.justify-content= "center";
         var img = document.querySelector("img");
-        img.style.height = "580px";
+        img.style.height = "614px";
         var heading = document.querySelector("h1");
         heading.innerHTML = "";
         """
