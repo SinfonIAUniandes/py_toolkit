@@ -94,6 +94,15 @@ class PyToolkit:
         self.promise=qi.Promise()
 
 
+        self.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
+        self.ALAutonomousLife.setState("disabled")
+        self.callback_posture_go_to_posture_srv(go_to_posture_srvRequest("stand"))
+
+        for _ in range(40):
+            self.ALTabletService.showWebview("198.18.0.1/apps/robot-page/input1.html")
+            
+
+
     # -----------------------------------------------------------------------------------------------------------------------
     # ----------------------------------------------------SERVICES CALLBACKS-------------------------------------------------
     # -----------------------------------------------------------------------------------------------------------------------
@@ -137,7 +146,9 @@ class PyToolkit:
     def callback_awareness_set_awareness_srv(self, req):
         print(consoleFormatter.format("\nRequested ALBasicAwareness/set_awareness_srv", "WARNING"))
         if req.data:
-            self.ALBasicAwareness.setEnabled(True)
+            if not self.ALBasicAwareness.isEnabled():
+                self.ALBasicAwareness.setEnabled(True)
+            self.ALBasicAwareness.resumeAwareness()
             print(consoleFormatter.format('Awareness is on!', 'OKGREEN'))
         else:
             self.ALBasicAwareness.pauseAwareness()
