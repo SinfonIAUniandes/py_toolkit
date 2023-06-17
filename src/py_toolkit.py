@@ -193,8 +193,7 @@ class PyToolkit:
         time.sleep(1)
         script="""
         var body = document.querySelector("body")
-        body.style.padding = "0";
-        body.style.width = "100vw";
+        body.style.margin = "0";
         body.style.display = "flex";
         body.style.justify-content= "center";
         var img = document.querySelector("img");
