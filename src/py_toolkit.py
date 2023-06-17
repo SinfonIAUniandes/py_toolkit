@@ -222,9 +222,16 @@ class PyToolkit:
             script="""
             var label = document.getElementById("myLabel");
             label.textContent = "{text}";
-
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
+            document.getElementById("input_id")
+                .addEventListener("keyup", function(event) \{
+                event.preventDefault();
+                if (event.keyCode === 13) \{
+                    sendButton.click();
+                \}
+            \});
+
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}")
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
