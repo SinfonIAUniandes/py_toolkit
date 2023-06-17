@@ -313,8 +313,9 @@ if __name__ == '__main__':
         pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
 
-        for _ in range(40):
+        for i in range(40):
             pytoolkit.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
+            print('overloading: ' + '#'*i + '\r')
 
     except rospy.ROSInterruptException:
         pass
