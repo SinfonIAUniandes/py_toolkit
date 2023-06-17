@@ -199,6 +199,7 @@ class PyToolkit:
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
+        pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
 
     def getInput(self,event):
         self.input=event
@@ -306,11 +307,15 @@ if __name__ == '__main__':
         pytoolkit.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
         pytoolkit.ALAutonomousLife.setState("disabled")
         pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
+        if not pytoolkit.ALBasicAwareness.isEnabled():
+            pytoolkit.ALBasicAwareness.setEnabled(True)
+        pytoolkit.ALBasicAwareness.resumeAwareness()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
 
         for i in range(40):
             pytoolkit.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
-            print('overloading: ' + '#'*i + '\r')
+            time.sleep(1)
+            print('overloading: ' + '#'*i ,sep='\r')
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
         print(consoleFormatter.format(" --------- PyToolkit node successfully initialized --------- ", "OKGREEN"))
         print(consoleFormatter.format(" ----------------------------------------------------------\n", "OKGREEN")) 
