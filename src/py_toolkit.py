@@ -226,18 +226,6 @@ class PyToolkit:
                     sendButton.click();
                 }
             });
-            window.addEventListener('resize', function() {
-            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-                document.activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            });
-
-            window.addEventListener('DOMContentLoaded', function() {
-            var inputElement = document.getElementById('input_id');
-            if (inputElement) {
-                inputElement.focus();
-            }
-            });
             """
             
             script="""
