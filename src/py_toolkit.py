@@ -311,11 +311,12 @@ if __name__ == '__main__':
             pytoolkit.ALBasicAwareness.setEnabled(True)
         pytoolkit.ALBasicAwareness.resumeAwareness()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
-
-        for i in range(8):
+        print("overloading tablet...")
+        for i in range(6):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
-            print("overloading: " +"#"*i)
             time.sleep(1)
+        pytoolkit.ALTabletService.hide()
+        pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
         print(consoleFormatter.format(" --------- PyToolkit node successfully initialized --------- ", "OKGREEN"))
         print(consoleFormatter.format(" ----------------------------------------------------------\n", "OKGREEN")) 
