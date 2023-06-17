@@ -90,6 +90,9 @@ class PyToolkit:
         self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', Empty, self.callback_tablet_hide_srv)
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
 
+        self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', Empty, self.callback_tablet_overload_srv)
+        print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))    
+
         self.input=""
         self.promise=qi.Promise()
 
@@ -135,7 +138,6 @@ class PyToolkit:
         return SetBoolResponse(True, "OK")
 
     # ----------------------------------------------------ALBasicAwareness------------------------------------------------
-
     def callback_awareness_set_awareness_srv(self, req):
         print(consoleFormatter.format("\nRequested ALBasicAwareness/set_awareness_srv", "WARNING"))
         if req.data:
@@ -272,6 +274,12 @@ class PyToolkit:
         self.ALTabletService.hide()
         print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
         return 
+
+    def callback_tablet_overload_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTabletService/hide_srv", "WARNING"))
+        self.ALTabletService.hide()
+        print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
+        return 
     
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
@@ -316,6 +324,7 @@ if __name__ == '__main__':
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1)
         pytoolkit.ALTabletService.hide()
+        time.sleep(1)
         pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
         print(consoleFormatter.format(" --------- PyToolkit node successfully initialized --------- ", "OKGREEN"))
