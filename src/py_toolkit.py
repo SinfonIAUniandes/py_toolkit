@@ -193,7 +193,7 @@ class PyToolkit:
         time.sleep(3)
         script="""
         var img = document.querySelector("img");
-        img.style.width = "1280px";
+        img.style.height = "720px";
         var heading = document.querySelector("h1");
         heading.innerHTML = "";
         """
