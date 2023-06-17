@@ -227,6 +227,7 @@ class PyToolkit:
             document.getElementById("input_id")
                 .addEventListener("keyup", function(event) \{
                 event.preventDefault();
+                alert(event.keyCode);
                 if (event.keyCode === 13) \{
                     sendButton.click();
                 \}
