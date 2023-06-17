@@ -226,6 +226,12 @@ class PyToolkit:
                     sendButton.click();
                 }
             });
+
+            document.getElementById("input_id").bind("click", function () {
+                var textBox = document.activeElement.id;
+                document.getElementById(input_id).scrollIntoView();
+            });
+
             """
             
             script="""
