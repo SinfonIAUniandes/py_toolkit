@@ -246,7 +246,7 @@ class PyToolkit:
 	        yesButton.onclick = function(){codigo};
             var noButton = document.getElementById("noB");
 	        noButton.onclick = function(){codigo2};
-            """.format(codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
+            """.format(text=req.text,codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
