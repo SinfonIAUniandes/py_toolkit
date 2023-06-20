@@ -220,7 +220,8 @@ class PyToolkit:
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
             enter = """
-            document.getElementById("input_id").addEventListener("keyup", function(event) {
+            var input = document.getElementById('input_id');
+            input.addEventListener("keyup", function(event) {
                 event.preventDefault();
                 if (event.keyCode === 13) {
                     sendButton.click();
@@ -232,8 +233,9 @@ class PyToolkit:
             label.textContent = "{text}";
             var sendButton = document.getElementById("sendB");
 	        sendButton.onclick = function(){codigo};
-            {enter_code}            
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}", enter_code =enter)
+            {enter_code}
+            input.focus();
+            """.format(text=req.text,codigo="{input.value;\nALTabletBinding.raiseEvent(input);}", enter_code =enter)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
