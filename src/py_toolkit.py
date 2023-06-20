@@ -235,7 +235,7 @@ class PyToolkit:
 	        sendButton.onclick = function(){codigo};
             {enter_code}
             input.focus();
-            """.format(text=req.text,codigo="{input.value;\nALTabletBinding.raiseEvent(input);}", enter_code =enter)
+            """.format(text=req.text,codigo="{ALTabletBinding.raiseEvent(input.value);}", enter_code =enter)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script="""
