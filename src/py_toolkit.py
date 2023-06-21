@@ -44,22 +44,22 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandRightBackTouched")
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandRightBackTouched")
         self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandRightLeftTouched")
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandRightLeftTouched")
         self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandRightRightTouched")
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandRightRightTouched")
         self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandLeftBackTouched")
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandLeftBackTouched")
         self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandLeftLeftTouched")
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandLeftLeftTouched")
         self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandLeftRightTouched")
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandLeftRightTouched")
         self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
 
         # Service Naoqi Clients
@@ -71,7 +71,6 @@ class PyToolkit:
         self.ALTabletService = session.service("ALTabletService")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALTouchService = session.service("ALTouch")
-        self.ALTouchService.subscribe()
         self.ALSpeechRecognitionService.subscribe("potato")
         
         # Service ROS Servers - ALAudioDevice
