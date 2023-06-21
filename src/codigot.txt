@@ -1,0 +1,12 @@
+var label = document.getElementById("myLabel");
+label.textContent = "+++++";
+var sendButton = document.getElementById("sendB");
+sendButton.onclick = function(){ALTabletBinding.raiseEvent(input.value);};
+var input = document.getElementById('input_id');
+input.addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        sendButton.click();
+                }
+});
+input.focus();

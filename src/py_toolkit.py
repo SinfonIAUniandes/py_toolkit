@@ -219,48 +219,14 @@ class PyToolkit:
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
-            enter = """
-            var input = document.getElementById('input_id');
-            input.addEventListener("keyup", function(event) {
-                event.preventDefault();
-                if (event.keyCode === 13) {
-                    sendButton.click();
-                }
-            });
-            """
-            script="""
-            var label = document.getElementById("myLabel");
-            label.textContent = "{text}";
-            var sendButton = document.getElementById("sendB");
-	        sendButton.onclick = function(){codigo};
-            {enter_code}
-            input.focus();
-            """.format(text=req.text,codigo="{ALTabletBinding.raiseEvent(input.value);}", enter_code =enter)
+            script=open("D:/codigot.txt","r").read().replace("+++++",req.text)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
-            script="""
-            var label = document.getElementById("myLabel");
-            label.textContent = "{text}";   
-            
-            var yesButton = document.getElementById("yesB");
-	        yesButton.onclick = function(){codigo};
-            var noButton = document.getElementById("noB");
-	        noButton.onclick = function(){codigo2};
-            """.format(text=req.text,codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
+            script=open("D:/codigob.txt","r").read().replace("+++++",req.text)
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
-            script="""
-
-            var textbox = document.getElementById('input_id');
-
-            var array = "{text}".split(",");
-            for (var i = 0; i<array.length; i++)
-            {codigo2}
-
-            var sendButton = document.getElementById("sendB");
-	        sendButton.onclick = function(){codigo};
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
+            script=open("D:/codigol.txt","r").read().replace("+++++",req.text)
         time.sleep(1)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);

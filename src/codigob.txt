@@ -1,0 +1,6 @@
+var label = document.getElementById("myLabel");
+label.textContent = "+++++";   
+var yesButton = document.getElementById("yesB");
+yesButton.onclick = function(){ALTabletBinding.raiseEvent('yes');};
+var noButton = document.getElementById("noB");
+noButton.onclick = function(){ALTabletBinding.raiseEvent('no');};

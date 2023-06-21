@@ -1,0 +1,12 @@
+var textbox = document.getElementById('input_id');
+var array = "+++++".split(",");
+for (var i = 0; i<array.length; i++)
+{
+    var opt = document.createElement('option');
+    opt.value = array[i];
+    opt.innerHTML=array[i];
+    textbox.appendChild(opt);
+}
+var sendButton = document.getElementById("sendB");
+sendButton.onclick = function(){var input = document.getElementById('input_id').value;
+ALTabletBinding.raiseEvent(input);};
