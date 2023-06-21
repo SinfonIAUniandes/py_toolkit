@@ -6,7 +6,7 @@ import time
 import rospy
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -66,7 +66,7 @@ class PyToolkit:
         self.motionSetSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_security_distance_srv', set_security_distance_srv, self.callback_motion_set_security_distance_srv)    
         print(consoleFormatter.format('Set_security_distance_srv on!', 'OKGREEN'))
 
-        self.motionSetOpenCloseHandServer = rospy.Service('pytoolkit/ALMotion/set_open_close_hand_srv', SetBool, self.callback_motion_set_open_close_hand_srv)
+        self.motionSetOpenCloseHandServer = rospy.Service('pytoolkit/ALMotion/set_open_close_hand_srv', set_open_close_hand_srv, self.callback_motion_set_open_close_hand_srv)
         print(consoleFormatter.format('Set_open_close_hand_srv on!', 'OKGREEN'))
 
         
@@ -182,7 +182,7 @@ class PyToolkit:
             elif req.state == "close":
                 self.ALMotion.setAngles("RHand", 0.0, 0.2)
                 print(consoleFormatter.format('Right hand is closed!', 'OKGREEN'))
-        return SetBoolResponse(True, "OK")
+        return set_open_close_hand_srvResponse(True, "OK")
 
 
 
