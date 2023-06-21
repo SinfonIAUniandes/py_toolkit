@@ -71,7 +71,7 @@ class PyToolkit:
         self.ALTabletService = session.service("ALTabletService")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALTouchService = session.service("ALTouch")
-        print(self.ALTouchService.getStatus())
+        self.ALTouchService.subscribe()
         self.ALSpeechRecognitionService.subscribe("potato")
         
         # Service ROS Servers - ALAudioDevice
