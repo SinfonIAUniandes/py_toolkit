@@ -66,6 +66,9 @@ class PyToolkit:
         self.motionSetSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_security_distance_srv', set_security_distance_srv, self.callback_motion_set_security_distance_srv)    
         print(consoleFormatter.format('Set_security_distance_srv on!', 'OKGREEN'))
 
+        self.motionSetOpenCloseHandServer = rospy.Service('pytoolkit/ALMotion/set_open_close_hand_srv', SetBool, self.callback_motion_set_open_close_hand_srv)
+        print(consoleFormatter.format('Set_open_close_hand_srv on!', 'OKGREEN'))
+
         
         # Service ROS Servers - ALRobotPosture
         self.postureGoToPostureServer = rospy.Service('pytoolkit/ALRobotPosture/go_to_posture_srv', go_to_posture_srv, self.callback_posture_go_to_posture_srv)
@@ -162,6 +165,25 @@ class PyToolkit:
         self.ALMotion.setTangentialSecurityDistance(req.distance)
         print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
         return set_security_distance_srvResponse("OK")
+    
+    def callback_motion_set_open_close_hand_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/open_close_hand_srv", "WARNING"))
+        if req.hand == "left" or req.hand == "both":
+            if req.state == "open":
+                self.ALMotion.setAngles("LHand", 1.0, 0.2)
+                print(consoleFormatter.format('Left hand is open!', 'OKGREEN'))
+            elif req.state == "close":
+                self.ALMotion.setAngles("LHand", 0.0, 0.2)
+                print(consoleFormatter.format('Left hand is closed!', 'OKGREEN'))
+        if req.hand == "right" or req.hand == "both":
+            if req.state == "open":
+                self.ALMotion.setAngles("RHand", 1.0, 0.2)
+                print(consoleFormatter.format('Right hand is open!', 'OKGREEN'))
+            elif req.state == "close":
+                self.ALMotion.setAngles("RHand", 0.0, 0.2)
+                print(consoleFormatter.format('Right hand is closed!', 'OKGREEN'))
+        return SetBoolResponse(True, "OK")
+
 
 
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
