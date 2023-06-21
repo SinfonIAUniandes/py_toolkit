@@ -42,7 +42,6 @@ class PyToolkit:
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
-        self.ALSpeechRecognitionService.subscribe("potato")
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -259,7 +258,7 @@ class PyToolkit:
             """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
         time.sleep(1)
         signalID = 0
-        signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
+        signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
         self.ALTabletService.executeJS(script)
         while self.input=="":
             time.sleep(1)
