@@ -4,9 +4,9 @@
 import qi
 import time
 import rospy
+import rospkg
 import argparse
 import sys
-import pathlib
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
@@ -22,7 +22,7 @@ class PyToolkit:
 
         #CONSTANTS
 
-        self.PYTOOLKIT_FOLDER=pathlib.Path(__file__).parent.resolve()
+        self.PYTOOLKIT_FOLDER=rospkg.RosPack().get_path("py_toolkit")
 
 
         # Publishers
@@ -226,14 +226,14 @@ class PyToolkit:
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
-            script=open(self.PYTOOLKIT_FOLDER+"/codigot.txt","r").read().replace("+++++",req.text)
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigot.txt","r").read().replace("+++++",req.text)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
-            script=open(self.PYTOOLKIT_FOLDER+"codigob.txt","r").read().replace("+++++",req.text)
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigob.txt","r").read().replace("+++++",req.text)
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
-            script=open(self.PYTOOLKIT_FOLDER+"codigol.txt","r").read().replace("+++++",req.text)
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
         time.sleep(1)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
