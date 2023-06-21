@@ -1,5 +1,4 @@
 var label = document.getElementById("myLabel");
-label.textContent = "+++++";
 prompt("banana");
 var yesButton = document.getElementById("yesB");
 yesButton.onclick = function(){ALTabletBinding.raiseEvent("yes");};
