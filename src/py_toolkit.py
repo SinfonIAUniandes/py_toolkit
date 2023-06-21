@@ -71,6 +71,7 @@ class PyToolkit:
         self.ALTabletService = session.service("ALTabletService")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALTouchService = session.service("ALTouch")
+        print(self.ALTouchService.getStatus())
         self.ALSpeechRecognitionService.subscribe("potato")
         
         # Service ROS Servers - ALAudioDevice
@@ -309,6 +310,7 @@ class PyToolkit:
 
     def on_hand_touch_event(self, value):
         status = value
+        print(status)
         self.ALTouchService.publish(hand_touch_event_msg(status,True))
 
 
