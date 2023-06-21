@@ -235,11 +235,11 @@ class PyToolkit:
             self.ALTabletService.loadUrl("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
-        time.sleep(1)
         print(script)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
+        time.sleep(1)
         self.ALTabletService.showWebview()
         while self.input=="":
             time.sleep(1)
