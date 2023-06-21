@@ -4,6 +4,7 @@
 import qi
 import time
 import rospy
+import rospkg
 import argparse
 import sys
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse
@@ -17,6 +18,12 @@ class PyToolkit:
     # -----------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, session):
+
+
+        #CONSTANTS
+
+        self.PYTOOLKIT_FOLDER=rospkg.RosPack().get_path("py_toolkit")
+
 
         # Publishers
 
@@ -94,14 +101,14 @@ class PyToolkit:
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
 
         self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', Empty, self.callback_tablet_overload_srv)
-        print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))    
+        print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))  
 
         # Service ROS Servers - ALTracker
         self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
         print(consoleFormatter.format('Point_at_srv on!', 'OKGREEN'))    
 
         self.input=""
-        self.promise=qi.Promise()
+        self.promise=qi.Promise()  
 
             
 
@@ -203,6 +210,7 @@ class PyToolkit:
     def callback_tablet_show_image_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
         self.ALTabletService.showImage(req.url)
+        time.sleep(1)
         print(consoleFormatter.format('Image shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
     
@@ -214,8 +222,9 @@ class PyToolkit:
         return tablet_service_srvResponse("OK")
 
     def callback_tablet_topic_srv(self, req):
+        ip=open(self.PYTOOLKIT_FOLDER+"/resources/topic_srv.txt","r").read()
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
-        self.ALTabletService.showWebview("http://192.168.0.199:8080/stream_viewer?topic="+req.url)
+        self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
         time.sleep(3)
         script = """
         var body = document.querySelector("body");
@@ -245,44 +254,14 @@ class PyToolkit:
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
-            enter = """
-            document.getElementById("input_id").addEventListener("keyup", function(event) {
-                event.preventDefault();
-                if (event.keyCode === 13) {
-                    sendButton.click();
-                }
-            });
-            """
-            script="""
-            var label = document.getElementById("myLabel");
-            label.textContent = "{text}";
-            var sendButton = document.getElementById("sendB");
-	        sendButton.onclick = function(){codigo};
-            {enter_code}            
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}", enter_code =enter)
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigot.txt","r").read().replace("+++++",req.text)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
-            script="""
-            
-            var yesButton = document.getElementById("yesB");
-	        yesButton.onclick = function(){codigo};
-            var noButton = document.getElementById("noB");
-	        noButton.onclick = function(){codigo2};
-            """.format(codigo="{ALTabletBinding.raiseEvent('yes');}",codigo2="{ALTabletBinding.raiseEvent('no');}")
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigob.txt","r").read().replace("+++++",req.text)
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
-            script="""
-
-            var textbox = document.getElementById('input_id');
-
-            var array = "{text}".split(",");
-            for (var i = 0; i<array.length; i++)
-            {codigo2}
-
-            var sendButton = document.getElementById("sendB");
-	        sendButton.onclick = function(){codigo};
-            """.format(text=req.text,codigo="{var input = document.getElementById('input_id').value;\nALTabletBinding.raiseEvent(input);}",codigo2="{var opt = document.createElement('option');\nopt.value = array[i];\nopt.innerHTML=array[i];\ntextbox.appendChild(opt);}")
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
         time.sleep(1)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
@@ -316,7 +295,7 @@ class PyToolkit:
     def callback_tablet_overload_srv(self, req):
         for i in range(10):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
-            time.sleep(1)
+            time.sleep(1.5)
         pytoolkit.ALTabletService.hide()
         return None
     
@@ -371,7 +350,7 @@ if __name__ == '__main__':
         print("overloading tablet...")
         for i in range(10):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
-            time.sleep(1)
+            time.sleep(1.5)
         pytoolkit.ALTabletService.hide()
         time.sleep(1)
         pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
