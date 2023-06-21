@@ -95,6 +95,7 @@ class PyToolkit:
 
         # Service ROS Servers - ALTracker
         self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
+        print(consoleFormatter.format('Point_at_srv on!', 'OKGREEN'))    
 
         self.input=""
         self.promise=qi.Promise()
