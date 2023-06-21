@@ -6,7 +6,7 @@ import time
 import rospy
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -40,8 +40,9 @@ class PyToolkit:
         self.ALBasicAwareness = session.service("ALBasicAwareness")
         self.ALMotion = session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
-        self.ALTabletService = session.service("ALTabletService")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
+        self.ALTabletService = session.service("ALTabletService")
+        self.ALTrackerService = session.service("ALTracker")
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -91,6 +92,9 @@ class PyToolkit:
 
         self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', Empty, self.callback_tablet_overload_srv)
         print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))    
+
+        # Service ROS Servers - ALTracker
+        self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
 
         self.input=""
         self.promise=qi.Promise()
@@ -292,6 +296,14 @@ class PyToolkit:
             time.sleep(1)
         pytoolkit.ALTabletService.hide()
         return None
+    
+    def callback_point_at_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTracker/point_at_srv", "WARNING"))
+        self.ALTrackerService.pointAt(req.effector_name, [req.x, req.y, req.z], req.frame, req.speed)
+        print(consoleFormatter.format('Pointing at!', 'OKGREEN'))
+        return point_at_srvResponse("OK")
+        
+        
     
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
