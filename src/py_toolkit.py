@@ -171,7 +171,7 @@ class PyToolkit:
         if req.hand == "left" or req.hand == "both":
             if req.state == "open":
                 self.ALMotion.setAngles("LHand", 1.0, 0.2)
-                self.ALMotion.setAngles("WristYaw", 1.0, 0.2)
+                self.ALMotion.setAngles("LWristYaw", 1.0, 0.2)
                 print(consoleFormatter.format('Left hand is open!', 'OKGREEN'))
             elif req.state == "close":
                 self.ALMotion.setAngles("LHand", 0.0, 0.2)
