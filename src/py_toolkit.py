@@ -226,21 +226,20 @@ class PyToolkit:
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
-            self.ALTabletService.loadUrl("http://198.18.0.1/apps/robot-page/input1.html")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigot.txt","r").read().replace("+++++",req.text)
         elif req.type=="bool":
-            self.ALTabletService.loadUrl("http://198.18.0.1/apps/robot-page/input2.html")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigob.txt","r").read().replace("+++++",req.text)
         elif req.type=="list":
-            self.ALTabletService.loadUrl("http://198.18.0.1/apps/robot-page/input3.html")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
+        time.sleep(1)
         print(script)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
-        time.sleep(1)
-        self.ALTabletService.showWebview()
         while self.input=="":
             time.sleep(1)
         self.ALTabletService.hide()
