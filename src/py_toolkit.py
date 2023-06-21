@@ -184,6 +184,8 @@ class PyToolkit:
     def callback_tablet_show_image_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
         self.ALTabletService.showImage(req.url)
+        time.sleep(1)
+        self.ALTabletService.resumeGif()
         print(consoleFormatter.format('Image shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
     
@@ -236,7 +238,6 @@ class PyToolkit:
             #Si el req.text no esta separado por comas tira error
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
         time.sleep(1)
-        print(script)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
