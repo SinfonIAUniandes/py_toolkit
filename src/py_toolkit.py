@@ -182,8 +182,7 @@ class PyToolkit:
             elif req.state == "close":
                 self.ALMotion.setAngles("RHand", 0.0, 0.2)
                 print(consoleFormatter.format('Right hand is closed!', 'OKGREEN'))
-        return set_open_close_hand_srvResponse(True, "OK")
-
+        return set_open_close_hand_srvResponse("OK")
 
 
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
