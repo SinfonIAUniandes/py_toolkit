@@ -8,7 +8,7 @@ import rospkg
 import argparse
 import sys
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv
-from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
+from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg, hand_touch_event_msg
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
 
@@ -33,6 +33,9 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
 
+        self.ALTouchHandEventPublisher = rospy.Publisher('/pytoolkit/ALTouch/touch_event', hand_touch_event_msg, queue_size=10)
+        print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
+
         self.ALMemory = session.service("ALMemory")
         
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
@@ -40,6 +43,24 @@ class PyToolkit:
 
         self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
+        
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandRightBackTouched")
+        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandRightLeftTouched")
+        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandRightRightTouched")
+        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandLeftBackTouched")
+        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandLeftLeftTouched")
+        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        
+        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("HandLeftRightTouched")
+        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
 
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
@@ -49,6 +70,7 @@ class PyToolkit:
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALTabletService = session.service("ALTabletService")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
+        self.ALTouchService = session.service("ALTouch")
         self.ALSpeechRecognitionService.subscribe("potato")
         
         # Service ROS Servers - ALAudioDevice
@@ -284,6 +306,10 @@ class PyToolkit:
     def on_speech_recognition_status(self, value):
         status = value
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
+
+    def on_hand_touch_event(self, value):
+        status = value
+        self.ALTouchService.publish(hand_touch_event_msg(status,True))
 
 
 if __name__ == '__main__':
