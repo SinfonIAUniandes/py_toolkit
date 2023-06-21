@@ -195,8 +195,9 @@ class PyToolkit:
         return tablet_service_srvResponse("OK")
 
     def callback_tablet_topic_srv(self, req):
+        ip=open(self.PYTOOLKIT_FOLDER+"/resources/topic_srv.txt","r").read()
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
-        self.ALTabletService.showWebview("http://192.168.0.199:8080/stream_viewer?topic="+req.url)
+        self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
         time.sleep(3)
         script = """
         var body = document.querySelector("body");
@@ -225,19 +226,21 @@ class PyToolkit:
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
+            self.ALTabletService.loadUrl("http://198.18.0.1/apps/robot-page/input1.html")
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigot.txt","r").read().replace("+++++",req.text)
         elif req.type=="bool":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
+            self.ALTabletService.loadUrl("http://198.18.0.1/apps/robot-page/input2.html")
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigob.txt","r").read().replace("+++++",req.text)
         elif req.type=="list":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
+            self.ALTabletService.loadUrl("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
             script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
         time.sleep(1)
+        print(script)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
         self.ALTabletService.executeJS(script)
+        self.ALTabletService.showWebview()
         while self.input=="":
             time.sleep(1)
         self.ALTabletService.hide()
