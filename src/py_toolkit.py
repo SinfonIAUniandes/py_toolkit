@@ -219,14 +219,14 @@ class PyToolkit:
         #list es una lista de opciones de la que elige el usuario
         if req.type=="text":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
-            script=open("D:/codigot.txt","r").read().replace("+++++",req.text)
+            script=open("codigot.txt","r").read().replace("+++++",req.text)
         elif req.type=="bool":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
-            script=open("D:/codigob.txt","r").read().replace("+++++",req.text)
+            script=open("codigob.txt","r").read().replace("+++++",req.text)
         elif req.type=="list":
             self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
-            script=open("D:/codigol.txt","r").read().replace("+++++",req.text)
+            script=open("codigol.txt","r").read().replace("+++++",req.text)
         time.sleep(1)
         signalID = 0
         signalID = self.ALTabletService.onJSEvent.connect(self.getInput);
