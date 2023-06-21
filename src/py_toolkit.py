@@ -44,23 +44,23 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandRightBackTouched")
-        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        self.ALTouchHandEventSubscriber1 = self.ALMemory.subscribeToEvent("HandRightBackTouched")
+        self.ALTouchHandEventSubscriber1.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandRightLeftTouched")
-        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        self.ALTouchHandEventSubscriber2 = self.ALMemory.subscribeToEvent("HandRightLeftTouched")
+        self.ALTouchHandEventSubscriber2.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandRightRightTouched")
-        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        self.ALTouchHandEventSubscriber3 = self.ALMemory.subscribeToEvent("HandRightRightTouched")
+        self.ALTouchHandEventSubscriber3.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandLeftBackTouched")
-        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        self.ALTouchHandEventSubscriber4 = self.ALMemory.subscribeToEvent("HandLeftBackTouched")
+        self.ALTouchHandEventSubscriber4.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandLeftLeftTouched")
-        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        self.ALTouchHandEventSubscriber5 = self.ALMemory.subscribeToEvent("HandLeftLeftTouched")
+        self.ALTouchHandEventSubscriber5.signal.connect(self.on_hand_touch_event)
         
-        self.ALTouchHandEventSubscriber = self.ALMemory.subscriber("ALTouch/HandLeftRightTouched")
-        self.ALTouchHandEventSubscriber.signal.connect(self.on_hand_touch_event)
+        self.ALTouchHandEventSubscriber6 = self.ALMemory.subscribeToEvent("HandLeftRightTouched")
+        self.ALTouchHandEventSubscriber6.signal.connect(self.on_hand_touch_event)
 
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
