@@ -44,8 +44,8 @@ class PyToolkit:
         self.ALTrackerBlobDetected = self.ALMemory.subscriber('ALTracker/BlobDetected')
         self.ALTrackerBlobDetected.signal.connect(self.on_blob_detected)
 
-        #self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
-        #self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
+        self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
+        self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
 
         self.ALColorBlobDetectionColorBlobDetected = self.ALMemory.subscriber('ALTracker/ColorBlobDetected')
         self.ALColorBlobDetectionColorBlobDetected.signal.connect(self.on_color_blob_detected)
@@ -350,10 +350,10 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
     def on_blob_detected(self, value):
-        coordinates = self.ALSegmentation3D.getTopOfBlob(-1, 0, False)
+        coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, 0, False)
         print("blob detected")
         print(coordinates)
-        coordinates = self.ALSegmentation3D.getTopOfBlob(-1, -1, False)
+        coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, -1, False)
         print(coordinates)
 
     def on_object_detected(self, value):
