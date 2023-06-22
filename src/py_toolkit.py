@@ -115,7 +115,7 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()  
 
-        self.ALSegmentation3D.setBlobTrackingEnabled(True)
+        print(self.ALSegmentation3D.getTopOfBlob())
 
 
     # -----------------------------------------------------------------------------------------------------------------------
