@@ -115,7 +115,7 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()  
 
-        print(self.ALSegmentation3D.getTopOfBlob())
+        print(self.ALSegmentation3D.getTopOfBlob(-1, 0, False))
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -324,8 +324,9 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
     def on_blob_detected(self, value):
-        print(value)
-        print(self.ALMemory.getData("Segmentation3D/BlobsList"))
+        pass
+	#print(value)
+        #print(self.ALMemory.getData("Segmentation3D/BlobsList"))
 
 
 if __name__ == '__main__':
