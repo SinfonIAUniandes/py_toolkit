@@ -44,8 +44,13 @@ class PyToolkit:
         self.ALTrackerBlobDetected = self.ALMemory.subscriber('ALTracker/BlobDetected')
         self.ALTrackerBlobDetected.signal.connect(self.on_blob_detected)
 
-        self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
-        self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
+        #self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
+        #self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
+
+        self.ALColorBlobDetectionColorBlobDetected = self.ALMemory.subscriber('ALTracker/ColorBlobDetected')
+        self.ALColorBlobDetectionColorBlobDetected.signal.connect(self.on_color_blob_detected)
+
+
 
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
@@ -60,6 +65,9 @@ class PyToolkit:
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
+
+        self.ALColorBlobDetection = session.service("ALColorBlobDetection")
+        self.ALColorBlobDetection.subscribe("pytoolkit")
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -346,6 +354,10 @@ class PyToolkit:
 
     def on_object_detected(self, value):
         print(self.ALMemory.getData("CloseObjectDetection/ObjectInfo"))
+
+
+    def on_color_blob_detected(self, value):
+        print(value)
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
