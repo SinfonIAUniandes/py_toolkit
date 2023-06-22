@@ -217,7 +217,7 @@ class PyToolkit:
     def callback_segmentation3D_get_segmentation3D_srv(self, req):
         coordinates = self.ALSegmentation3D.getTopOfBlob(-1, 0, False)
         print(coordinates)
-        self.callback_point_at_srv(point_at_srvRequest(coordinates[0], coordinates[1], coordinates[2], 0))
+        self.callback_point_at_srv(point_at_srvRequest(coordinates[0], coordinates[1], coordinates[2], "RArm", 0, 0.1))
         print()
 
     # ----------------------------------------------------ALTabletService------------------------------------------------
