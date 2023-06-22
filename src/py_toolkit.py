@@ -51,6 +51,7 @@ class PyToolkit:
         self.ALMotion = session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALSegmentation3D = session.service("ALSegmentation3D")
+        self.ALSegmentation3D.subscribe("pytoolkit")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
