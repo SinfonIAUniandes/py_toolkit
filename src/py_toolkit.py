@@ -84,7 +84,10 @@ class PyToolkit:
         
         # Service ROS Servers - ALRobotPosture
         self.postureGoToPostureServer = rospy.Service('pytoolkit/ALRobotPosture/go_to_posture_srv', go_to_posture_srv, self.callback_posture_go_to_posture_srv)
-        
+        print(consoleFormatter.format('Go_to_posture_srv on!', 'OKGREEN'))
+
+        # Service ROS Servers - ALSegmentation3D
+        self.segmentation3DGetSegmentation3DServer = rospy.Service('pytoolkit/ALSegmentation3D/get_segmentation3D_srv', Empty, self.callback_segmentation3D_get_segmentation3D_srv)
 
         # Service ROS Servers - ALTabletService
         self.tabletShowImageServer = rospy.Service('pytoolkit/ALTabletService/show_image_srv', tablet_service_srv, self.callback_tablet_show_image_srv)
@@ -115,7 +118,7 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()  
 
-        print(self.ALSegmentation3D.getTopOfBlob(-1, 0, False))
+        
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -208,6 +211,11 @@ class PyToolkit:
             self.ALRobotPosture.goToPosture("Crouch", 0.5)
             print(consoleFormatter.format('Robot is in rest position!', 'OKGREEN'))
         return go_to_posture_srvResponse("OK")
+    
+    # ----------------------------------------------------ALRobotPosture------------------------------------------------
+
+    def callback_segmentation3D_get_segmentation3D_srv(self, req):
+        print(self.ALSegmentation3D.getTopOfBlob(-1, 0, False))
 
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
