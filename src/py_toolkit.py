@@ -354,7 +354,8 @@ class PyToolkit:
         pass
 
     def on_object_detected(self, value):
-        print(self.ALMemory.getData("CloseObjectDetection/ObjectInfo"))
+        #print(self.ALMemory.getData("CloseObjectDetection/ObjectInfo"))
+        pass
 
 
     def on_color_blob_detected(self, value):
