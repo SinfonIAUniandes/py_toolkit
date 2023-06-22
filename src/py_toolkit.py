@@ -6,7 +6,6 @@ import time
 import rospy
 import rospkg
 import argparse
-import almath
 import sys
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
@@ -351,26 +350,17 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
     def on_blob_detected(self, value):
-        pass
-	#print(value)
-        #print(self.ALMemory.getData("Segmentation3D/BlobsList"))
+        coordinates = self.ALSegmentation3D.getTopOfBlob(-1, 0, False)
+        print(coordinates)
+        coordinates = self.ALSegmentation3D.getTopOfBlob(-1, -1, False)
+        print(coordinates)
 
     def on_object_detected(self, value):
         print(self.ALMemory.getData("CloseObjectDetection/ObjectInfo"))
 
 
     def on_color_blob_detected(self, value):
-        #print(value)
-        position6D = almath.Position6D()
-        # Set the required properties of the Position6D object
-        # For example:
-        position6D.x = value[0][0]
-        position6D.y = value[0][1]
-        position6D.z = value[0][2]
-        position6D.thetaX = value[0][3]
-        position6D.thetaY = value[0][4]
-        position6D.thetaZ = value[0][5]
-        print(almath.position3DFromPosition6D(position6D))
+        print(self.ALColorBlobDetection.getCircle())
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
