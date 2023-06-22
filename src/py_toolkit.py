@@ -7,7 +7,7 @@ import rospy
 import rospkg
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -215,7 +215,10 @@ class PyToolkit:
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
 
     def callback_segmentation3D_get_segmentation3D_srv(self, req):
-        print(self.ALSegmentation3D.getTopOfBlob(-1, 0, False))
+        coordinates = self.ALSegmentation3D.getTopOfBlob(-1, 0, False)
+        print(coordinates)
+        self.callback_point_at_srv(point_at_srvRequest(coordinates[0], coordinates[1], coordinates[2], 0))
+        print()
 
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
