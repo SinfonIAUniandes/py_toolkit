@@ -41,12 +41,16 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
 
+        self.ALTrackerBlobDetected = self.ALMemory.subscriber('ALTracker/BlobDetected')
+        self.ALTrackerBlobDetected.signal.connect(self.on_blob_detected)
+
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
         self.ALAutonomousLife = session.service("ALAutonomousLife")
         self.ALBasicAwareness = session.service("ALBasicAwareness")
         self.ALMotion = session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
+        self.ALSegmentation3D = session.service("ALSegmentation3D")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
@@ -110,7 +114,7 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()  
 
-            
+        self.ALSegmentation3D.setBlobTrackingEnabled(True)
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -178,7 +182,6 @@ class PyToolkit:
         if req.hand == "left" or req.hand == "both":
             if req.state == "open":
                 self.ALMotion.setAngles("LHand", 1.0, 0.2)
-                self.ALMotion.setAngles("LWristYaw", 1.0, 0.2)
                 print(consoleFormatter.format('Left hand is open!', 'OKGREEN'))
             elif req.state == "close":
                 self.ALMotion.setAngles("LHand", 0.0, 0.2)
@@ -318,6 +321,10 @@ class PyToolkit:
     def on_speech_recognition_status(self, value):
         status = value
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
+
+    def on_blob_detected(self, value):
+        print(value)
+        print(self.ALMemory.getData("Segmentation3D/BlobsList"))
 
 
 if __name__ == '__main__':
