@@ -359,7 +359,7 @@ class PyToolkit:
 
 
     def on_color_blob_detected(self, value):
-        print(self.ALColorBlobDetection.getCircle())
+        print(value)
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
