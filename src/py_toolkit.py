@@ -44,10 +44,15 @@ class PyToolkit:
         self.ALTrackerBlobDetected = self.ALMemory.subscriber('ALTracker/BlobDetected')
         self.ALTrackerBlobDetected.signal.connect(self.on_blob_detected)
 
+        self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
+        self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
+
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
         self.ALAutonomousLife = session.service("ALAutonomousLife")
         self.ALBasicAwareness = session.service("ALBasicAwareness")
+        self.ALCloseObjectDetection = session.service("ALCloseObjectDetection")
+        self.ALCloseObjectDetection.subscribe("pytoolkit")
         self.ALMotion = session.service("ALMotion")
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALSegmentation3D = session.service("ALSegmentation3D")
@@ -339,6 +344,8 @@ class PyToolkit:
 	#print(value)
         #print(self.ALMemory.getData("Segmentation3D/BlobsList"))
 
+    def on_object_detected(self, value):
+        print(self.ALMemory.getData("CloseObjectDetection/ObjectInfo"))
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
