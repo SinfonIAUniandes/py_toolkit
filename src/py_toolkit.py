@@ -68,6 +68,8 @@ class PyToolkit:
 
         self.ALColorBlobDetection = session.service("ALColorBlobDetection")
         self.ALColorBlobDetection.subscribe("pytoolkit")
+
+        self.ALColorBlobDetection.setColor(98,52,18,50)
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
