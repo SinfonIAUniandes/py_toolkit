@@ -361,7 +361,16 @@ class PyToolkit:
 
     def on_color_blob_detected(self, value):
         #print(value)
-        print(almath.position3DFromPosition6D(value[0]))
+        position6D = almath.Position6D()
+        # Set the required properties of the Position6D object
+        # For example:
+        position6D.x = value[0][0]
+        position6D.y = value[0][1]
+        position6D.z = value[0][2]
+        position6D.thetaX = value[0][3]
+        position6D.thetaY = value[0][4]
+        position6D.thetaZ = value[0][5]
+        print(almath.position3DFromPosition6D(position6D))
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
