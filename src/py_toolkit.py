@@ -5,6 +5,7 @@ import qi
 import time
 import rospy
 import rospkg
+import math
 import argparse
 import sys
 from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest
@@ -41,14 +42,14 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
 
-        #self.ALTrackerBlobDetected = self.ALMemory.subscriber('ALTracker/BlobDetected')
-        #self.ALTrackerBlobDetected.signal.connect(self.on_blob_detected)
+        self.ALTrackerBlobDetected = self.ALMemory.subscriber('ALTracker/BlobDetected')
+        self.ALTrackerBlobDetected.signal.connect(self.on_blob_detected)
 
-        self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
-        self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
+        #self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
+        #self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
 
-        self.ALColorBlobDetectionColorBlobDetected = self.ALMemory.subscriber('ALTracker/ColorBlobDetected')
-        self.ALColorBlobDetectionColorBlobDetected.signal.connect(self.on_color_blob_detected)
+        #self.ALColorBlobDetectionColorBlobDetected = self.ALMemory.subscriber('ALTracker/ColorBlobDetected')
+        #self.ALColorBlobDetectionColorBlobDetected.signal.connect(self.on_color_blob_detected)
 
 
 
@@ -66,10 +67,12 @@ class PyToolkit:
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
 
-        self.ALColorBlobDetection = session.service("ALColorBlobDetection")
-        self.ALColorBlobDetection.subscribe("pytoolkit")
+        #self.ALColorBlobDetection = session.service("ALColorBlobDetection")
+        #self.ALColorBlobDetection.subscribe("pytoolkit")
 
-        self.ALColorBlobDetection.setColor(98,52,18,20)
+        #self.ALColorBlobDetection.setColor(98,52,18,20)
+
+        self.ALTrackerBlobDetected.setBlobTrackingEnabled(True)
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -334,7 +337,16 @@ class PyToolkit:
         self.ALTrackerService.pointAt(req.effector_name, [req.x, req.y, req.z], req.frame, req.speed)
         print(consoleFormatter.format('Pointing at!', 'OKGREEN'))
         return point_at_srvResponse("OK")
-        
+    
+
+    def angular_to_cartesian(self, x_angle, y_angle, distance):
+        # Conversión de coordenadas angulares a cartesianas
+        x = distance * math.sin(x_angle) * math.cos(y_angle)
+        y = distance * math.sin(y_angle)
+        z = distance * math.cos(x_angle) * math.cos(y_angle)
+        return x, y, z
+
+
         
     
     # -----------------------------------------------------------------------------------------------------------------------
@@ -350,6 +362,11 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
     def on_blob_detected(self, value):
+        info = self.ALMemory.getData("Segmentation3D/BlobsList")
+        blobs = info[1]
+        print("xD")
+        for blob in blobs:
+            print(self.angular_to_cartesian(blob[0][0], blob[0][1], blob[2]))
         #print("blob detected")
         pass
 
