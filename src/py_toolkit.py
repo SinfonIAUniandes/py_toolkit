@@ -72,7 +72,7 @@ class PyToolkit:
 
         #self.ALColorBlobDetection.setColor(98,52,18,20)
 
-        self.ALTrackerBlobDetected.setBlobTrackingEnabled(True)
+        self.ALSegmentation3D.setBlobTrackingEnabled(True)
         
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
