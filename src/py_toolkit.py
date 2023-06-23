@@ -376,13 +376,14 @@ class PyToolkit:
 
 
     def on_color_blob_detected(self, value):
-        print("brown")
-        print(self.ALColorBlobDetection.getCircle())
-        coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, 0, False)
-        print("blob detected")
-        print(coordinates)
-        coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, -1, False)
-        print(coordinates)
+        #print("brown")
+        #print(self.ALColorBlobDetection.getCircle())
+        #coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, 0, False)
+        #print("blob detected")
+        #print(coordinates)
+        #coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, -1, False)
+        #print(coordinates)
+        pass
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
