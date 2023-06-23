@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -98,6 +98,9 @@ class PyToolkit:
 
         self.motionSetOpenCloseHandServer = rospy.Service('pytoolkit/ALMotion/set_open_close_hand_srv', set_open_close_hand_srv, self.callback_motion_set_open_close_hand_srv)
         print(consoleFormatter.format('Set_open_close_hand_srv on!', 'OKGREEN'))
+
+        self.motionMoveHeadServer = rospy.Service('pytoolkit/ALMotion/move_head_srv', move_head_srv, self.callback_motion_move_head_srv)
+        print(consoleFormatter.format('Move_head_srv on!', 'OKGREEN'))
 
         
         # Service ROS Servers - ALRobotPosture
@@ -216,7 +219,19 @@ class PyToolkit:
                 self.ALMotion.setAngles("RHand", 0.0, 0.2)
                 print(consoleFormatter.format('Right hand is closed!', 'OKGREEN'))
         return set_open_close_hand_srvResponse("OK")
-
+    
+    def callback_motion_move_head_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/move_head_srv", "WARNING"))
+        if req.state == "up":
+            self.ALMotion.setAngles("HeadPitch", -0.4, 0.2)
+            print(consoleFormatter.format('Head is up!', 'OKGREEN'))
+        elif req.state == "down":
+            self.ALMotion.setAngles("HeadPitch", 0.46, 0.2)
+            print(consoleFormatter.format('Head is down!', 'OKGREEN'))
+        elif req.state == "default":
+            self.ALMotion.setAngles("HeadPitch", 0.0, 0.2)
+            print(consoleFormatter.format('Head is in default position!', 'OKGREEN'))
+        return move_head_srvResponse("OK")
 
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
     
