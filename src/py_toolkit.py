@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -259,8 +259,10 @@ class PyToolkit:
 
     def callback_segmentation3D_get_segmentation3D_srv(self, req):
         print(consoleFormatter.format("\nRequested ALSegmentation3D/get_segmentation3D_srv", "WARNING"))
-        coordinates = self.ALSegmentation3D.getTopOfBlob(-1, 0, False)
-        return coordinates
+        response = get_segmentation3D_srvResponse()
+        coordinates = list(self.ALSegmentation3D.getTopOfBlob(-1, 0, False))
+        response.coordinates = coordinates
+        return response
 
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
