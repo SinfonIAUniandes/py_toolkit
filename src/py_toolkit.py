@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse, get_segmentation3D_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -108,7 +108,7 @@ class PyToolkit:
         print(consoleFormatter.format('Go_to_posture_srv on!', 'OKGREEN'))
 
         # Service ROS Servers - ALSegmentation3D
-        self.segmentation3DGetSegmentation3DServer = rospy.Service('pytoolkit/ALSegmentation3D/get_segmentation3D_srv', Empty, self.callback_segmentation3D_get_segmentation3D_srv)
+        self.segmentation3DGetSegmentation3DServer = rospy.Service('pytoolkit/ALSegmentation3D/get_segmentation3D_srv', get_segmentation3D_srv, self.callback_segmentation3D_get_segmentation3D_srv)
 
         # Service ROS Servers - ALTabletService
         self.tabletShowImageServer = rospy.Service('pytoolkit/ALTabletService/show_image_srv', tablet_service_srv, self.callback_tablet_show_image_srv)
@@ -248,10 +248,9 @@ class PyToolkit:
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
 
     def callback_segmentation3D_get_segmentation3D_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALSegmentation3D/get_segmentation3D_srv", "WARNING"))
         coordinates = self.ALSegmentation3D.getTopOfBlob(-1, 0, False)
-        print(coordinates)
-        self.callback_point_at_srv(point_at_srvRequest(coordinates[0], coordinates[1], coordinates[2], "RArm", 0, 0.1))
-        print()
+        return coordinates
 
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
