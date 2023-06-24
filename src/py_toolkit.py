@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse , set_angle_srv , set_angle_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -130,7 +130,10 @@ class PyToolkit:
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
 
         self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', Empty, self.callback_tablet_overload_srv)
-        print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))  
+        print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))
+
+        self.set_angle = rospy.Service('pytoolkit/ALMotionService/set_angle_srv', set_angle_srv, self.callback_set_angle_srv)
+        print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))   
 
         # Service ROS Servers - ALTracker
         self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
@@ -232,7 +235,14 @@ class PyToolkit:
             self.ALMotion.setAngles("HeadPitch", 0.0, 0.2)
             print(consoleFormatter.format('Head is in default position!', 'OKGREEN'))
         return move_head_srvResponse("OK")
-
+    
+    def callback_set_angle_srv(self,req):
+        name = req.name
+        angle = req.angle
+        speed = req.speed
+        self.ALMotion.setAngles(name,angle,speed)
+        return set_angle_srvResponse("OK")
+    
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
     
     def callback_posture_go_to_posture_srv(self, req):
