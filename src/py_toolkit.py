@@ -237,10 +237,11 @@ class PyToolkit:
         return move_head_srvResponse("OK")
     
     def callback_set_angle_srv(self,req):
-        name = req.name
-        angle = req.angle
-        speed = req.speed
-        self.ALMotion.setAngles(name,angle,speed)
+        names = req.name
+        names = [s for sublist in names for s in sublist]
+        angles = req.angle
+        speeds = req.speed
+        self.ALMotion.setAngles(names,angles,speeds)
         return set_angle_srvResponse("OK")
     
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
