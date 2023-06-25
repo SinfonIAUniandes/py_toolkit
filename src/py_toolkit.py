@@ -238,7 +238,7 @@ class PyToolkit:
     
     def callback_set_angle_srv(self,req):
         names = req.name
-        names = [s for sublist in names for s in sublist]
+        names = tuple(names)
         angles = req.angle
         speeds = req.speed
         self.ALMotion.setAngles(names,angles,speeds)
