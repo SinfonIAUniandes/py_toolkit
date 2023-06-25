@@ -240,7 +240,6 @@ class PyToolkit:
         names = tuple(req.name)
         angles = tuple(req.angle)
         speed = req.speed
-	print(names,type(names))
         self.ALMotion.setAngles(names,angles,speed)
         return set_angle_srvResponse("OK")
     
