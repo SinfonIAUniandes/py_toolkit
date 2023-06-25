@@ -237,12 +237,11 @@ class PyToolkit:
         return move_head_srvResponse("OK")
     
     def callback_set_angle_srv(self,req):
-        names = req.name
-        print(names)
-        names = tuple(names)
-        angles = req.angle
-        speeds = req.speed
-        self.ALMotion.setAngles(names,angles,speeds)
+        names = tuple(req.name)
+        angles = tuple(req.angle)
+        speeds = tuple(req.speed)
+	print(names,type(names))
+        self.ALMotion.setAngles(names,angles,speeds[0])
         return set_angle_srvResponse("OK")
     
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
@@ -392,9 +391,10 @@ class PyToolkit:
     def on_blob_detected(self, value):
         info = self.ALMemory.getData("Segmentation3D/BlobsList")
         blobs = info[1]
-        print("xD")
+        #print("xD")
         for blob in blobs:
-            print(self.angular_to_cartesian(blob[0][0], blob[0][1], blob[2]))
+            #print(self.angular_to_cartesian(blob[0][0], blob[0][1], blob[2]))
+	    pass
         #print("blob detected")
         pass
 
