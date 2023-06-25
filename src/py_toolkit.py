@@ -239,9 +239,9 @@ class PyToolkit:
     def callback_set_angle_srv(self,req):
         names = tuple(req.name)
         angles = tuple(req.angle)
-        speeds = tuple(req.speed)
+        speed = req.speed
 	print(names,type(names))
-        self.ALMotion.setAngles(names,angles,speeds[0])
+        self.ALMotion.setAngles(names,angles,speed)
         return set_angle_srvResponse("OK")
     
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
