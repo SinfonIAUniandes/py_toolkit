@@ -238,6 +238,7 @@ class PyToolkit:
     
     def callback_set_angle_srv(self,req):
         names = req.name
+        print(names)
         names = tuple(names)
         angles = req.angle
         speeds = req.speed
