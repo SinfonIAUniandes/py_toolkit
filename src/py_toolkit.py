@@ -174,7 +174,6 @@ class PyToolkit:
             print(consoleFormatter.format('Awareness is on!', 'OKGREEN'))
         else:
             self.ALBasicAwareness.setEnabled(req.data)
-            self.callback_motion
             print(consoleFormatter.format('Awareness is off!', 'OKGREEN'))
         return SetBoolResponse(True, "OK")
 
