@@ -229,8 +229,9 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALMotion/set_move_arms_enabled_srv", "WARNING"))
         self.ALMotion.setMoveArmsEnabled(req.LArm, req.RArm)
         while True:
-            armsEnabled = self.ALMotion.getMoveArmsEnabled()
-            if armsEnabled[0] != req.LArm or armsEnabled[1] != req.RArm:
+            LArmEnabled = self.ALMotion.getMoveArmsEnabled("LArm")
+            RArmEnabled = self.ALMotion.getMoveArmsEnabled("RArm")
+            if LArmEnabled != req.LArm or RArmEnabled != req.RArm:
                 self.ALMotion.setMoveArmsEnabled(req.LArm, req.RArm)
             else:
                 break
