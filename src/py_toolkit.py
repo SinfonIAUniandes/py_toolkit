@@ -82,7 +82,7 @@ class PyToolkit:
         self.motionMoveHeadServer = rospy.Service('pytoolkit/ALMotion/move_head_srv', move_head_srv, self.callback_motion_move_head_srv)
         print(consoleFormatter.format('Move_head_srv on!', 'OKGREEN'))
 
-        self.set_angle = rospy.Service('pytoolkit/ALMotionService/set_angle_srv', set_angle_srv, self.callback_set_angle_srv)
+        self.motionSetAngleServer = rospy.Service('pytoolkit/ALMotion/set_angle_srv', set_angle_srv, self.callback_motion_set_angle_srv)
         print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))  
 
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
@@ -173,6 +173,7 @@ class PyToolkit:
             print(consoleFormatter.format('Awareness is on!', 'OKGREEN'))
         else:
             self.ALBasicAwareness.setEnabled(req.data)
+            self.callback_motion
             print(consoleFormatter.format('Awareness is off!', 'OKGREEN'))
         return SetBoolResponse(True, "OK")
 
@@ -206,22 +207,19 @@ class PyToolkit:
     def callback_motion_move_head_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/move_head_srv", "WARNING"))
         if req.state == "up":
-            self.ALMotion.setAngles("HeadPitch", -0.4, 0.2)
+            self.ALMotion.setAngles(["HeadPitch", "HeadYaw"], [-0.4, 0.0], 0.15)
             print(consoleFormatter.format('Head is up!', 'OKGREEN'))
         elif req.state == "down":
-            self.ALMotion.setAngles("HeadPitch", 0.46, 0.2)
+            self.ALMotion.setAngles(["HeadPitch", "HeadYaw"], [0.46, 0.0], 0.2)
             print(consoleFormatter.format('Head is down!', 'OKGREEN'))
         elif req.state == "default":
-            self.ALMotion.setAngles("HeadPitch", 0.0, 0.2)
+            self.ALMotion.setAngles(["HeadPitch", "HeadYaw"], [0.0, 0.0], 0.2)
             print(consoleFormatter.format('Head is in default position!', 'OKGREEN'))
         return move_head_srvResponse("OK")
     
-    def callback_set_angle_srv(self,req):
+    def callback_motion_set_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
-        names = tuple(req.name)
-        angles = tuple(req.angle)
-        speed = req.speed
-        self.ALMotion.setAngles(names,angles,speed)
+        self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
         print(consoleFormatter.format('Angles set!', 'OKGREEN'))
         return set_angle_srvResponse("OK")
     
