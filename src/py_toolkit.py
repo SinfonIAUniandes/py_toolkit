@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, point_at_srvRequest, move_head_srv, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -20,14 +20,10 @@ class PyToolkit:
 
     def __init__(self, session):
 
-
         #CONSTANTS
-
         self.PYTOOLKIT_FOLDER=rospkg.RosPack().get_path("py_toolkit")
 
-
         # Publishers
-
         self.ALTextToSpeechStatusPublisher = rospy.Publisher('/pytoolkit/ALTextToSpeech/status', text_to_speech_status_msg, queue_size=10)
         print(consoleFormatter.format("ALTextToSpeech/status topic is up!","OKGREEN"))
 
@@ -41,16 +37,6 @@ class PyToolkit:
 
         self.ALSpeechRecognitionStatusSubscriber = self.ALMemory.subscriber("ALSpeechRecognition/Status")
         self.ALSpeechRecognitionStatusSubscriber.signal.connect(self.on_speech_recognition_status)
-
-        self.ALTrackerBlobDetected = self.ALMemory.subscriber('ALTracker/BlobDetected')
-        self.ALTrackerBlobDetected.signal.connect(self.on_blob_detected)
-
-        #self.ALCloseObjectDetectionObjectDetected = self.ALMemory.subscriber('CloseObjectDetection/ObjectDetected')
-        #self.ALCloseObjectDetectionObjectDetected.signal.connect(self.on_object_detected)
-
-        #self.ALColorBlobDetectionColorBlobDetected = self.ALMemory.subscriber('ALTracker/ColorBlobDetected')
-        #self.ALColorBlobDetectionColorBlobDetected.signal.connect(self.on_color_blob_detected)
-
 
 
         # Service Naoqi Clients
@@ -66,14 +52,8 @@ class PyToolkit:
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
-
-        #self.ALColorBlobDetection = session.service("ALColorBlobDetection")
-        #self.ALColorBlobDetection.subscribe("pytoolkit")
-
-        #self.ALColorBlobDetection.setColor(98,52,18,20)
-
-        self.ALSegmentation3D.setBlobTrackingEnabled(True)
         
+
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
         print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
@@ -101,6 +81,12 @@ class PyToolkit:
 
         self.motionMoveHeadServer = rospy.Service('pytoolkit/ALMotion/move_head_srv', move_head_srv, self.callback_motion_move_head_srv)
         print(consoleFormatter.format('Move_head_srv on!', 'OKGREEN'))
+
+        self.set_angle = rospy.Service('pytoolkit/ALMotionService/set_angle_srv', set_angle_srv, self.callback_set_angle_srv)
+        print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))  
+
+        self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
+        print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
 
         
         # Service ROS Servers - ALRobotPosture
@@ -132,8 +118,6 @@ class PyToolkit:
         self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', Empty, self.callback_tablet_overload_srv)
         print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))
 
-        self.set_angle = rospy.Service('pytoolkit/ALMotionService/set_angle_srv', set_angle_srv, self.callback_set_angle_srv)
-        print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))   
 
         # Service ROS Servers - ALTracker
         self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
@@ -142,9 +126,6 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()  
 
-        self.ALMotion.setMoveArmsEnabled(False, False)
-
-        
 
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -169,7 +150,6 @@ class PyToolkit:
         self.ALSpeechRecognitionService.setAudioExpression(req.noise)
         self.ALSpeechRecognitionService.setVisualExpression(req.eyes)
         return "OK"
-
     
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
 
@@ -189,12 +169,10 @@ class PyToolkit:
     def callback_awareness_set_awareness_srv(self, req):
         print(consoleFormatter.format("\nRequested ALBasicAwareness/set_awareness_srv", "WARNING"))
         if req.data:
-            if not self.ALBasicAwareness.isEnabled():
-                self.ALBasicAwareness.setEnabled(True)
-            self.ALBasicAwareness.resumeAwareness()
+            self.ALBasicAwareness.setEnabled(req.data)
             print(consoleFormatter.format('Awareness is on!', 'OKGREEN'))
         else:
-            self.ALBasicAwareness.pauseAwareness()
+            self.ALBasicAwareness.setEnabled(req.data)
             print(consoleFormatter.format('Awareness is off!', 'OKGREEN'))
         return SetBoolResponse(True, "OK")
 
@@ -239,11 +217,34 @@ class PyToolkit:
         return move_head_srvResponse("OK")
     
     def callback_set_angle_srv(self,req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
         names = tuple(req.name)
         angles = tuple(req.angle)
         speed = req.speed
         self.ALMotion.setAngles(names,angles,speed)
+        print(consoleFormatter.format('Angles set!', 'OKGREEN'))
         return set_angle_srvResponse("OK")
+    
+    def callback_motion_set_move_arms_enabled_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_move_arms_enabled_srv", "WARNING"))
+        self.ALMotion.setMoveArmsEnabled(req.LArm, req.RArm)
+        while True:
+            armsEnabled = self.ALMotion.getMoveArmsEnabled()
+            if armsEnabled[0] != req.LArm or armsEnabled[1] != req.RArm:
+                self.ALMotion.setMoveArmsEnabled(req.LArm, req.RArm)
+            else:
+                break
+        if req.LArm:
+            print(consoleFormatter.format("LArm movement has been enabled!", "OKGREEN"))
+        else:
+            print(consoleFormatter.format("LArm movement has been disabled!", "OKGREEN"))
+        if req.RArm:
+            print(consoleFormatter.format("RArm movement has been enabled!", "OKGREEN"))
+        else:
+            print(consoleFormatter.format("RArm movement has been disabled!", "OKGREEN"))
+        return set_move_arms_enabled_srvResponse("OK")
+    
+
     
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
     
@@ -374,8 +375,6 @@ class PyToolkit:
         z = distance * math.cos(x_angle) * math.cos(y_angle)
         return x, y, z
 
-
-        
     
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
@@ -389,30 +388,6 @@ class PyToolkit:
         status = value
         self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(status))
 
-    def on_blob_detected(self, value):
-        info = self.ALMemory.getData("Segmentation3D/BlobsList")
-        blobs = info[1]
-        #print("xD")
-        for blob in blobs:
-            #print(self.angular_to_cartesian(blob[0][0], blob[0][1], blob[2]))
-	    pass
-        #print("blob detected")
-        pass
-
-    def on_object_detected(self, value):
-        #print(self.ALMemory.getData("CloseObjectDetection/ObjectInfo"))
-        pass
-
-
-    def on_color_blob_detected(self, value):
-        #print("brown")
-        #print(self.ALColorBlobDetection.getCircle())
-        #coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, 0, False)
-        #print("blob detected")
-        #print(coordinates)
-        #coordinates = self.ALSegmentation3D.getTopOfBlob(0.6, -1, False)
-        #print(coordinates)
-        pass
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
