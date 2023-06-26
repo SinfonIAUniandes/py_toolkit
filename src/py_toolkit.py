@@ -143,7 +143,8 @@ class PyToolkit:
         self.promise=qi.Promise()  
 
         self.ALMotion.setMoveArmsEnabled(False, False)
-
+	self.ALMotion.setWalkArmsEnabled(False, False)
+	print(self.ALMotion.getMoveArmsEnabled("Arms"))
         
 
 
@@ -361,6 +362,10 @@ class PyToolkit:
         return None
     
     def callback_point_at_srv(self, req):
+	print(self.ALMotion.getMoveArmsEnabled("Arms"))
+	self.ALMotion.setMoveArmsEnabled(False, False)
+        self.ALMotion.setWalkArmsEnabled(False, False)
+        print(self.ALMotion.getMoveArmsEnabled("Arms"))
         print(consoleFormatter.format("\nRequested ALTracker/point_at_srv", "WARNING"))
         self.ALTrackerService.pointAt(req.effector_name, [req.x, req.y, req.z], req.frame, req.speed)
         print(consoleFormatter.format('Pointing at!', 'OKGREEN'))
