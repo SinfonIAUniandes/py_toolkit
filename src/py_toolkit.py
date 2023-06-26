@@ -142,6 +142,8 @@ class PyToolkit:
         self.input=""
         self.promise=qi.Promise()  
 
+        self.ALMotion.setMoveArmsEnabled(False, False)
+
         
 
 
