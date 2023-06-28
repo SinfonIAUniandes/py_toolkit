@@ -183,6 +183,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALMotion/set_security_distance_srv", "WARNING"))
         self.ALMotion.setOrthogonalSecurityDistance(req.distance)
         self.ALMotion.setTangentialSecurityDistance(req.distance)
+        self.ALMotion.setCollisionProtectionEnabled("Arms", False)
         print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
         return set_security_distance_srvResponse("OK")
     
