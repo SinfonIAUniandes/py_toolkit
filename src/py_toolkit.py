@@ -254,7 +254,7 @@ class PyToolkit:
 
     def callback_navigation_navigate_to_srv(self, req):
         print(consoleFormatter.format("\nRequested ALNavigation/navigate_to_srv", "WARNING"))
-        self.ALNavigation.navigateTo(req.x, req.y)
+        self.ALNavigation.navigateTo(req.x_coordinate, req.y_coordinate)
         print(consoleFormatter.format('Robot is navigating to the given coordinates!', 'OKGREEN'))
         return navigate_to_srvResponse("OK")
     
