@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse
+from robot_toolkit_msgs.srv import tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -47,7 +47,6 @@ class PyToolkit:
         self.ALCloseObjectDetection.subscribe("pytoolkit")
         self.ALMotion = session.service("ALMotion")
         self.ALNavigation = session.service("ALNavigation")
-        self.ALNavigation.navigateTo(1.0,0.0)
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALSegmentation3D = session.service("ALSegmentation3D")
         self.ALSegmentation3D.subscribe("pytoolkit")
@@ -89,6 +88,11 @@ class PyToolkit:
 
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
         print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
+
+
+        # Service ROS Servers - ALNavigation
+        self.navigationNavigateToServer = rospy.Service('pytoolkit/ALNavigation/navigate_to_srv', navigate_to_srv, self.callback_navigation_navigate_to_srv)
+        print(consoleFormatter.format('Navigate_to_srv on!', 'OKGREEN'))
 
         
         # Service ROS Servers - ALRobotPosture
@@ -245,6 +249,14 @@ class PyToolkit:
         else:
             print(consoleFormatter.format("RArm movement has been disabled!", "OKGREEN"))
         return set_move_arms_enabled_srvResponse("OK")
+
+    # ----------------------------------------------------ALNavigation-------------------------------------------------
+
+    def callback_navigation_navigate_to_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALNavigation/navigate_to_srv", "WARNING"))
+        self.ALNavigation.navigateTo(req.x, req.y)
+        print(consoleFormatter.format('Robot is navigating to the given coordinates!', 'OKGREEN'))
+        return navigate_to_srvResponse("OK")
     
 
     
