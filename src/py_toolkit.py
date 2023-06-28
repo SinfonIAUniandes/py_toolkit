@@ -46,6 +46,8 @@ class PyToolkit:
         self.ALCloseObjectDetection = session.service("ALCloseObjectDetection")
         self.ALCloseObjectDetection.subscribe("pytoolkit")
         self.ALMotion = session.service("ALMotion")
+        self.ALNavigation = session.service("ALNavigation")
+        self.ALNavigation.navigateTo(1.0,0.0)
         self.ALRobotPosture = session.service("ALRobotPosture")
         self.ALSegmentation3D = session.service("ALSegmentation3D")
         self.ALSegmentation3D.subscribe("pytoolkit")
