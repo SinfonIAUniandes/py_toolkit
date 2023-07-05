@@ -90,7 +90,7 @@ class PyToolkit:
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
         print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
 
-        self.motionSetStiffness = rospy.Service('pytoolkit/ALMotion/set_stiffness_srv', set_stiffness_srv, self.callback_set_stiffness_srv)
+        self.motionSetStiffness = rospy.Service('pytoolkit/ALMotion/set_stiffnesses_srv', set_stiffness_srv, self.callback_set_stiffness_srv)
         print(consoleFormatter.format('set_stiffness_srv on!', 'OKGREEN'))
 
 
@@ -262,7 +262,7 @@ class PyToolkit:
         return set_move_arms_enabled_srvResponse("OK")
         
     def callback_set_stiffness_srv(self, req):
-        rint(consoleFormatter.format("\nRequested ALMotion/set_stiffness_srv", "WARNING"))
+        print(consoleFormatter.format("\nRequested ALMotion/set_stiffness_srv", "WARNING"))
         self.ALMotion.setStiffnesses(tuple(req.names), tuple(req.stiffnesses))
         print(consoleFormatter.format('Stiffness set!', 'OKGREEN'))
         return set_stiffness_srvResponse("OK") 
