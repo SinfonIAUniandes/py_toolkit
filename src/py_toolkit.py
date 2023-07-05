@@ -265,7 +265,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALMotion/set_stiffnesses_srv", "WARNING"))
         self.ALMotion.setStiffnesses(req.names, req.stiffnesses)
         print(consoleFormatter.format('Stiffness set!', 'OKGREEN'))
-        return set_stiffness_srvResponse("OK") 
+        return set_stiffnesses_srvResponse("OK") 
 
     # ----------------------------------------------------ALNavigation-------------------------------------------------
 
