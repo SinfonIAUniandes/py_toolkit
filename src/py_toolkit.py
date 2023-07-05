@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffness_srv, set_stiffness_srvResponse
+from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -90,8 +90,8 @@ class PyToolkit:
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
         print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
 
-        self.motionSetStiffnessesServer = rospy.Service('pytoolkit/ALMotion/set_stiffnesses_srv', set_stiffness_srv, self.callback_set_stiffness_srv)
-        print(consoleFormatter.format('set_stiffness_srv on!', 'OKGREEN'))
+        self.motionSetStiffnessesServer = rospy.Service('pytoolkit/ALMotion/set_stiffnesses_srv', set_stiffnesses_srv, self.callback_set_stiffnesses_srv)
+        print(consoleFormatter.format('set_stiffnesses_srv on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALNavigation
@@ -261,9 +261,9 @@ class PyToolkit:
             print(consoleFormatter.format("RArm movement has been disabled!", "OKGREEN"))
         return set_move_arms_enabled_srvResponse("OK")
         
-    def callback_set_stiffness_srv(self, req):
+    def callback_set_stiffnesses_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/set_stiffnesses_srv", "WARNING"))
-        self.ALMotion.setStiffnesses(req.name, req.stiffness)
+        self.ALMotion.setStiffnesses(req.names, req.stiffnesses)
         print(consoleFormatter.format('Stiffness set!', 'OKGREEN'))
         return set_stiffness_srvResponse("OK") 
 
