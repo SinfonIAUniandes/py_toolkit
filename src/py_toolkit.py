@@ -262,8 +262,8 @@ class PyToolkit:
         return set_move_arms_enabled_srvResponse("OK")
         
     def callback_set_stiffness_srv(self, req):
-        print(consoleFormatter.format("\nRequested ALMotion/set_stiffness_srv", "WARNING"))
-        self.ALMotion.setStiffnesses(req.names, req.stiffnesses)
+        print(consoleFormatter.format("\nRequested ALMotion/set_stiffnesses_srv", "WARNING"))
+        self.ALMotion.setStiffnesses(req.name, req.stiffness)
         print(consoleFormatter.format('Stiffness set!', 'OKGREEN'))
         return set_stiffness_srvResponse("OK") 
 
