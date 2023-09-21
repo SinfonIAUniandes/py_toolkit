@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse
+from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse, Empty
 import ConsoleFormatter
@@ -55,6 +55,7 @@ class PyToolkit:
         self.ALPeoplePerception = session.service("ALPeoplePerception")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
+        self.ALBatteryService = session.service("ALBattery")
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -105,6 +106,10 @@ class PyToolkit:
 
         # Service ROS Servers - ALSegmentation3D
         self.segmentation3DGetSegmentation3DServer = rospy.Service('pytoolkit/ALSegmentation3D/get_segmentation3D_srv', get_segmentation3D_srv, self.callback_segmentation3D_get_segmentation3D_srv)
+
+        # Service ROS Servers - ALBatteryService
+        self.getBatteryPorcentage = rospy.Service('pytoolkit/ALBatteryService/get_porcentage', battery_service_srv, self.callback_battery_get_porcentage_srv)
+        print(consoleFormatter.format('get_porcentage_srv on!', 'OKGREEN'))   
 
         # Service ROS Servers - ALTabletService
         self.tabletShowImageServer = rospy.Service('pytoolkit/ALTabletService/show_image_srv', tablet_service_srv, self.callback_tablet_show_image_srv)
@@ -306,6 +311,12 @@ class PyToolkit:
         color = self.ALMemory.getData('PeoplePerception/Person/'+id+'/ShirtColor')
         return color
 
+    # ----------------------------------------------------ALBatteryService------------------------------------------------
+
+    def callback_battery_get_porcentage_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALBatteryService/get_porcentage_srv", "WARNING"))
+        return self.ALBatteryService.getBatteryCharge()
+    
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
     def callback_tablet_show_image_srv(self, req):
