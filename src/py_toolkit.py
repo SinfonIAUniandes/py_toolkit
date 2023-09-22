@@ -315,7 +315,7 @@ class PyToolkit:
 
     def callback_battery_get_porcentage_srv(self, req):
         print(consoleFormatter.format("\nRequested ALBatteryService/get_porcentage_srv", "WARNING"))
-        return self.ALBatteryService.getBatteryCharge()
+        return str(self.ALBatteryService.getBatteryCharge())
     
     # ----------------------------------------------------ALTabletService------------------------------------------------
 
