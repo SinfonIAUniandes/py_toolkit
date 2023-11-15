@@ -463,8 +463,8 @@ if __name__ == '__main__':
         pytoolkit.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
         pytoolkit.ALAutonomousLife.setState("disabled")
         pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
-        if not pytoolkit.ALBasicAwareness.isEnabled():
-            pytoolkit.ALBasicAwareness.setEnabled(True)
+        if pytoolkit.ALBasicAwareness.isEnabled():
+            pytoolkit.ALBasicAwareness.setEnabled(False)
         pytoolkit.ALBasicAwareness.resumeAwareness()
         pytoolkit.ALBasicAwareness.pauseAwareness()
         pytoolkit.ALBasicAwareness.resumeAwareness()
