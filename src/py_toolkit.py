@@ -73,6 +73,11 @@ class PyToolkit:
         # Service ROS Servers - ALBasicAwareness
         self.awarenessSetAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/set_awareness_srv', SetBool, self.callback_awareness_set_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
+        self.awarenessPauseAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/pause_awareness_srv', SetBool, self.callback_awareness_pause_awareness_srv)
+        print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
+        self.awarenessResumeAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/resume_awareness_srv', SetBool, self.callback_awareness_resume_awareness_srv)
+        print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
+
 
         
         # Service ROS Servers - ALMotion
@@ -137,6 +142,10 @@ class PyToolkit:
         # Service ROS Servers - ALTracker
         self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
         print(consoleFormatter.format('Point_at_srv on!', 'OKGREEN'))    
+        self.trackerPauseTrackerServer = rospy.Service('pytoolkit/ALTracker/stop_tracker_srv', SetBool, self.callback_stop_tracker_srv)
+        print(consoleFormatter.format('Stop_tracker_srv on!', 'OKGREEN'))    
+        self.trackerStartTrackerServer = rospy.Service('pytoolkit/ALTracker/start_tracker_srv', SetBool, self.callback_start_tracker_srv)
+        print(consoleFormatter.format('Start_tracker_srv on!', 'OKGREEN'))    
 
         self.input=""
         self.promise=qi.Promise()  
@@ -188,15 +197,37 @@ class PyToolkit:
         return SetBoolResponse(True, "OK")
 
     # ----------------------------------------------------ALBasicAwareness------------------------------------------------
+    #Este servicio es para poner el estado del awareness
     def callback_awareness_set_awareness_srv(self, req):
         print(consoleFormatter.format("\nRequested ALBasicAwareness/set_awareness_srv", "WARNING"))
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
+        self.ALBasicAwareness.setEnabled(req.data)
         if req.data:
-            self.ALBasicAwareness.resumeAwareness()
             print(consoleFormatter.format('Awareness is on!', 'OKGREEN'))
         else:
-            self.ALBasicAwareness.pauseAwareness()
             print(consoleFormatter.format('Awareness is off!', 'OKGREEN'))
+        return SetBoolResponse(True, "OK")
+
+    #Este es para pausar el awareness
+    def callback_awareness_pause_awareness_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALBasicAwareness/pause_awareness_srv", "WARNING"))
+        self.callback_motion_move_head_srv(move_head_srvRequest("default"))
+        self.ALBasicAwareness.startAwareness()
+        self.ALBasicAwareness.resumeAwareness()
+        self.ALBasicAwareness.pauseAwareness()
+        self.ALBasicAwareness.stopAwareness()
+        print(consoleFormatter.format('Awareness is paused!', 'OKGREEN'))
+        return SetBoolResponse(True, "OK")
+
+    #Este es para reanudar el awarenes
+    def callback_awareness_resume_awareness_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALBasicAwareness/start_awareness_srv", "WARNING"))
+        self.callback_motion_move_head_srv(move_head_srvRequest("default"))
+        self.ALBasicAwareness.stopAwareness()
+        self.ALBasicAwareness.startAwareness()
+        self.ALBasicAwareness.pauseAwareness()
+        self.ALBasicAwareness.resumeAwareness()
+        print(consoleFormatter.format('Awareness is resumed!', 'OKGREEN'))
         return SetBoolResponse(True, "OK")
 
     # ----------------------------------------------------ALMotion------------------------------------------------
@@ -412,20 +443,34 @@ class PyToolkit:
         pytoolkit.ALTabletService.hide()
         return None
     
+    # ----------------------------------------------------ALTrackerService------------------------------------------------
+
     def callback_point_at_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTracker/point_at_srv", "WARNING"))
         self.ALTrackerService.pointAt(req.effector_name, [req.x, req.y, req.z], req.frame, req.speed)
         print(consoleFormatter.format('Pointing at!', 'OKGREEN'))
         return point_at_srvResponse("OK")
-    
 
-    def angular_to_cartesian(self, x_angle, y_angle, distance):
-        # Conversión de coordenadas angulares a cartesianas
-        x = distance * math.sin(x_angle) * math.cos(y_angle)
-        y = distance * math.sin(y_angle)
-        z = distance * math.cos(x_angle) * math.cos(y_angle)
-        return x, y, z
+    #Este es para parar el tracker
+    def callback_stop_tracker_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTracker/stop_tracker_srv", "WARNING"))
+        self.callback_motion_move_head_srv(move_head_srvRequest("default"))
+        self.ALBasicAwareness.startAwareness()
+        self.ALBasicAwareness.resumeAwareness()
+        self.ALBasicAwareness.pauseAwareness()
+        self.ALBasicAwareness.stopAwareness()
+        self.ALTrackerService.stopTracker()
+        print(consoleFormatter.format('Tracker has stopped!', 'OKGREEN'))
+        return SetBoolResponse(True, "OK")
 
+    #Este es para reiniciar el tracker
+    def callback_start_tracker_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTracker/start_tracker_srv", "WARNING"))
+        self.callback_motion_move_head_srv(move_head_srvRequest("default"))
+        self.ALTrackerService.registerTarget("Face",10)
+        self.ALTrackerService.track("Face")
+        print(consoleFormatter.format('Tracker has started!', 'OKGREEN'))
+        return SetBoolResponse(True, "OK")
     
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
@@ -466,9 +511,11 @@ if __name__ == '__main__':
         pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
         if pytoolkit.ALBasicAwareness.isEnabled():
             pytoolkit.ALBasicAwareness.setEnabled(False)
+        pytoolkit.ALBasicAwareness.startAwareness()
         pytoolkit.ALBasicAwareness.resumeAwareness()
         pytoolkit.ALBasicAwareness.pauseAwareness()
-	pytoolkit.ALTrackerService.stopTracker()
+        pytoolkit.ALBasicAwareness.stopAwareness()
+	    pytoolkit.ALTrackerService.stopTracker()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         print("overloading tablet...")
         for i in range(10):
