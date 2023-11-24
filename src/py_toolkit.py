@@ -73,9 +73,9 @@ class PyToolkit:
         # Service ROS Servers - ALBasicAwareness
         self.awarenessSetAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/set_awareness_srv', SetBool, self.callback_awareness_set_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
-        self.awarenessPauseAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/pause_awareness_srv', SetBool, self.callback_awareness_pause_awareness_srv)
+        self.awarenessPauseAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/pause_awareness_srv', Empty, self.callback_awareness_pause_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
-        self.awarenessResumeAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/resume_awareness_srv', SetBool, self.callback_awareness_resume_awareness_srv)
+        self.awarenessResumeAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/resume_awareness_srv', Empty, self.callback_awareness_resume_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
 
 
@@ -142,9 +142,9 @@ class PyToolkit:
         # Service ROS Servers - ALTracker
         self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
         print(consoleFormatter.format('Point_at_srv on!', 'OKGREEN'))    
-        self.trackerPauseTrackerServer = rospy.Service('pytoolkit/ALTracker/stop_tracker_srv', SetBool, self.callback_stop_tracker_srv)
+        self.trackerPauseTrackerServer = rospy.Service('pytoolkit/ALTracker/stop_tracker_srv', Empty, self.callback_stop_tracker_srv)
         print(consoleFormatter.format('Stop_tracker_srv on!', 'OKGREEN'))    
-        self.trackerStartTrackerServer = rospy.Service('pytoolkit/ALTracker/start_tracker_srv', SetBool, self.callback_start_tracker_srv)
+        self.trackerStartTrackerServer = rospy.Service('pytoolkit/ALTracker/start_tracker_srv', Empty, self.callback_start_tracker_srv)
         print(consoleFormatter.format('Start_tracker_srv on!', 'OKGREEN'))    
 
         self.input=""
@@ -457,6 +457,8 @@ class PyToolkit:
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
         self.ALBasicAwareness.startAwareness()
         self.ALBasicAwareness.resumeAwareness()
+        self.ALTrackerService.registerTarget("Face",10)
+        self.ALTrackerService.track("Face")
         self.ALBasicAwareness.pauseAwareness()
         self.ALBasicAwareness.stopAwareness()
         self.ALTrackerService.stopTracker()
