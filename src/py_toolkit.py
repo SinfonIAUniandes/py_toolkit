@@ -10,7 +10,7 @@ import argparse
 import sys
 from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
-from std_srvs.srv import SetBool, SetBoolResponse, Empty
+from std_srvs.srv import SetBool, SetBoolResponse
 import ConsoleFormatter
 
 class PyToolkit:
@@ -73,9 +73,9 @@ class PyToolkit:
         # Service ROS Servers - ALBasicAwareness
         self.awarenessSetAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/set_awareness_srv', SetBool, self.callback_awareness_set_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
-        self.awarenessPauseAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/pause_awareness_srv', Empty, self.callback_awareness_pause_awareness_srv)
+        self.awarenessPauseAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/pause_awareness_srv', battery_service_srv, self.callback_awareness_pause_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
-        self.awarenessResumeAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/resume_awareness_srv', Empty, self.callback_awareness_resume_awareness_srv)
+        self.awarenessResumeAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/resume_awareness_srv', battery_service_srv, self.callback_awareness_resume_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
 
 
@@ -132,19 +132,19 @@ class PyToolkit:
         self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/get_input_srv', get_input_srv, self.callback_tablet_get_input_srv)
         print(consoleFormatter.format('Get_input_srv on!', 'OKGREEN'))  
 
-        self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', Empty, self.callback_tablet_hide_srv)
+        self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', battery_service_srv, self.callback_tablet_hide_srv)
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
 
-        self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', Empty, self.callback_tablet_overload_srv)
+        self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', battery_service_srv, self.callback_tablet_overload_srv)
         print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALTracker
         self.trackerPointAtServer = rospy.Service('pytoolkit/ALTracker/point_at_srv', point_at_srv, self.callback_point_at_srv)
         print(consoleFormatter.format('Point_at_srv on!', 'OKGREEN'))    
-        self.trackerPauseTrackerServer = rospy.Service('pytoolkit/ALTracker/stop_tracker_srv', Empty, self.callback_stop_tracker_srv)
+        self.trackerPauseTrackerServer = rospy.Service('pytoolkit/ALTracker/stop_tracker_srv', battery_service_srv, self.callback_stop_tracker_srv)
         print(consoleFormatter.format('Stop_tracker_srv on!', 'OKGREEN'))    
-        self.trackerStartTrackerServer = rospy.Service('pytoolkit/ALTracker/start_tracker_srv', Empty, self.callback_start_tracker_srv)
+        self.trackerStartTrackerServer = rospy.Service('pytoolkit/ALTracker/start_tracker_srv', battery_service_srv, self.callback_start_tracker_srv)
         print(consoleFormatter.format('Start_tracker_srv on!', 'OKGREEN'))    
 
         self.input=""
@@ -217,7 +217,7 @@ class PyToolkit:
         self.ALBasicAwareness.pauseAwareness()
         self.ALBasicAwareness.stopAwareness()
         print(consoleFormatter.format('Awareness is paused!', 'OKGREEN'))
-        return SetBoolResponse(True, "OK")
+        return "OK"
 
     #Este es para reanudar el awarenes
     def callback_awareness_resume_awareness_srv(self, req):
@@ -228,7 +228,7 @@ class PyToolkit:
         self.ALBasicAwareness.pauseAwareness()
         self.ALBasicAwareness.resumeAwareness()
         print(consoleFormatter.format('Awareness is resumed!', 'OKGREEN'))
-        return SetBoolResponse(True, "OK")
+        return "OK"
 
     # ----------------------------------------------------ALMotion------------------------------------------------
 
@@ -434,14 +434,14 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTabletService/hide_srv", "WARNING"))
         self.ALTabletService.hide()
         print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
-        return None
+        return "OK"
 
     def callback_tablet_overload_srv(self, req):
         for i in range(10):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1.5)
         pytoolkit.ALTabletService.hide()
-        return None
+        return "OK"
     
     # ----------------------------------------------------ALTrackerService------------------------------------------------
 
@@ -468,7 +468,7 @@ class PyToolkit:
         self.ALBasicAwareness.stopAwareness()
         self.ALTrackerService.stopTracker()
         print(consoleFormatter.format('Tracker has stopped!', 'OKGREEN'))
-        return SetBoolResponse(True, "OK")
+        return "OK"
 
     #Este es para reiniciar el tracker
     def callback_start_tracker_srv(self, req):
@@ -477,7 +477,7 @@ class PyToolkit:
         self.ALTrackerService.registerTarget("Face",10)
         self.ALTrackerService.track("Face")
         print(consoleFormatter.format('Tracker has started!', 'OKGREEN'))
-        return SetBoolResponse(True, "OK")
+        return "OK"
     
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
