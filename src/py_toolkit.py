@@ -455,7 +455,7 @@ class PyToolkit:
     def callback_stop_tracker_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTracker/stop_tracker_srv", "WARNING"))
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
-        self.ALBasicAwareness.setMaximumDistanceDetection(0.1)
+        self.ALTrackerService.setMaximumDistanceDetection(0.1)
         print(consoleFormatter.format('Tracker has stopped!', 'OKGREEN'))
         return "OK"
 
