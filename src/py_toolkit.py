@@ -455,14 +455,7 @@ class PyToolkit:
     def callback_stop_tracker_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTracker/stop_tracker_srv", "WARNING"))
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
-        self.ALBasicAwareness.startAwareness()
-        self.ALBasicAwareness.resumeAwareness()
-        self.ALTrackerService.registerTarget("Face",10)
-        self.ALTrackerService.track("Face")
-        time.sleep(1)
-        self.ALBasicAwareness.pauseAwareness()
-        self.ALBasicAwareness.stopAwareness()
-        self.ALTrackerService.stopTracker()
+        self.ALBasicAwareness.setMaximumDistanceDetection(0.1)
         print(consoleFormatter.format('Tracker has stopped!', 'OKGREEN'))
         return "OK"
 
@@ -470,8 +463,7 @@ class PyToolkit:
     def callback_start_tracker_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTracker/start_tracker_srv", "WARNING"))
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
-        self.ALTrackerService.registerTarget("Face",10)
-        self.ALTrackerService.track("Face")
+        self.ALTrackerService.setMaximumDistanceDetection(3.5)
         print(consoleFormatter.format('Tracker has started!', 'OKGREEN'))
         return "OK"
     
