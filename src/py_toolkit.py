@@ -501,17 +501,17 @@ class PyToolkit:
         
     
     def on_move(self, msg):
+        print(consoleFormatter.format("\nRequested ALMotion/move", "WARNING"))
+        if (msg.linear.x==0) and (msg.linear.y==0) and (msg.angular.z==0):
+            print(consoleFormatter.format("\nStopping Movement", "WARNING"))
+            self.ALMotion.stopMove()
         if (msg.linear.x==self.x) and (msg.linear.y==self.y) and (msg.angular.z==self.theta):
             print(consoleFormatter.format("\nReceived same coordinates, not going to move :b", "WARNING"))
         else:
             self.x = msg.linear.x
             self.y = msg.linear.y
             self.theta = msg.angular.z
-            if (msg.linear.x==0) and (msg.linear.y==0) and (msg.angular.z==0):
-                print(consoleFormatter.format("\nStopping Movement", "WARNING"))
-                self.ALMotion.stopMove()
-            print(consoleFormatter.format("\nRequested ALMotion/move", "WARNING"))
-            self.ALMotion.moveTo(msg.linear.x, msg.linear.y, msg.angular.z)
+            self.ALMotion.move(msg.linear.x, msg.linear.y, msg.angular.z)
             
         
         
