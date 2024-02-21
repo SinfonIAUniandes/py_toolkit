@@ -11,6 +11,7 @@ import sys
 from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse
+from geometry_msgs.msg import Twist
 import ConsoleFormatter
 
 class PyToolkit:
@@ -30,6 +31,10 @@ class PyToolkit:
 
         self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
+
+        # Subscriber
+        self.ALMotionMovePublisher = rospy.Subscriber('/pytoolkit/ALMotion/move', Twist, self.on_move)
+        print(consoleFormatter.format("ALMotion/move subscriber is up!","OKGREEN"))
 
         self.ALMemory = session.service("ALMemory")
         
@@ -151,6 +156,11 @@ class PyToolkit:
 
         self.input=""
         self.promise=qi.Promise()  
+        
+        # Last coordinates send to the robot to move
+        self.x = 0
+        self.y = 0
+        self.theta = 0
 
         # Service ROS Servers - ALPerception
         
@@ -488,6 +498,23 @@ class PyToolkit:
 
     def on_Perception_Tshirt(self, id):
         self.id = id 
+        
+    
+    def on_move(self, msg):
+        if (msg.linear.x==self.x) and (msg.linear.y==self.y) and (msg.angular.z==self.theta):
+            self.x = msg.linear.x
+            self.y = msg.linear.y
+            self.theta = msg.angular.z
+            if (msg.linear.x==0) and (msg.linear.y==0) and (msg.angular.z==0):
+                print(consoleFormatter.format("\nStopping Movement", "WARNING"))
+                self.ALMotion.stopMove()
+            print(consoleFormatter.format("\nRequested ALMotion/move", "WARNING"))
+            self.ALMotion.moveTo(msg.linear.x, msg.linear.y, msg.angular.z)
+        else:
+            print(consoleFormatter.format("\nReceived same coordinates, not going to move :b", "WARNING"))
+            
+        
+        
 
 
 if __name__ == '__main__':
