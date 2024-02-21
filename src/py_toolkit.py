@@ -501,7 +501,7 @@ class PyToolkit:
         
     
     def on_move(self, msg):
-        if (msg.linear.x==self.x) and (msg.linear.y==self.y) and (msg.angular.z==self.theta):
+        if (msg.linear.x!=self.x) and (msg.linear.y!=self.y) and (msg.angular.z!=self.theta):
             self.x = msg.linear.x
             self.y = msg.linear.y
             self.theta = msg.angular.z
