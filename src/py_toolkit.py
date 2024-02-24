@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv
+from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse
 from geometry_msgs.msg import Twist
@@ -32,6 +32,9 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
 
+        self.ALSensorsPublisher = rospy.Publisher('/pytoolkit/ALSensors/obstacles', speech_recognition_status_msg, queue_size=10)
+        print(consoleFormatter.format("ALSensors/obstacles topic is up!","OKGREEN"))
+
         # Subscriber
         self.ALMotionMovePublisher = rospy.Subscriber('/pytoolkit/ALMotion/move', Twist, self.on_move)
         print(consoleFormatter.format("ALMotion/move subscriber is up!","OKGREEN"))
@@ -40,10 +43,21 @@ class PyToolkit:
         
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
         self.ALTextToSpeechStatusSubscriber.signal.connect(self.on_tts_status)
+        
+        self.ALSpeechRecognitionSubscriber = self.ALMemory.subscriber("WordRecognized")
+        self.ALSpeechRecognitionSubscriber.signal.connect(self.on_speech_recognition_status)
 
         # Perception Subscriber
         self.ALPeoplePerceptionSubscriber = self.ALMemory.subscriber("PeoplePerception/JustArrived")
         self.ALPeoplePerceptionSubscriber.signal.connect(self.on_Perception_Tshirt)
+
+        # Navigation Subscriber
+        #self.ALSensorsRightSubscriber = self.ALMemory.subscriber("Device/SubDeviceList/Platform/InfraredSpot/Right/Sensor/Value")
+        #self.ALSensorsLeftSubscriber = self.ALMemory.subscriber("Device/SubDeviceList/Platform/InfraredSpot/Left/Sensor/Value")
+        #self.ALSensorsRightSubscriber.signal.connect(self.on_Perception_Tshirt)
+        #self.ALSensorsLeftSubscriber.signal.connect(self.on_Perception_Tshirt)
+        #self.ALSensorsRightSubscriber = self.ALMemory.subscriber("Device/SubDeviceList/Platform/Front/Sonar/Sensor/Value")
+        #self.ALSensorsRightSubscriber.signal.connect(self.on_Perception_Tshirt)
 
         # Service Naoqi Clients
         self.ALAudioDevice = session.service("ALAudioDevice")
@@ -70,6 +84,9 @@ class PyToolkit:
 
         self.audioHearingServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_speechrecognition_srv', set_speechrecognition_srv, self.callback_set_speechrecognition_srv)
         print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
+
+        self.wordsServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_words_srv', speech_recognition_srv, self.callback_set_words_srv)
+        print(consoleFormatter.format('ALSpeechRecognition/set_words_srv on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALAutonomousLife
@@ -188,12 +205,19 @@ class PyToolkit:
         return str(self.ALAudioDevice.getOutputVolume())
 
     # ----------------------------------------------------ALAudioDevice------------------------------------------------------
-
+    
+    def callback_set_words_srv(self, req):
+        self.ALSpeechRecognitionService.setVocabulary(req.words,False)
+        return "OK"
+    
     def callback_set_speechrecognition_srv(self, req):
+        self.ALSpeechRecognitionService.pause(True)
         if req.subscribe:
             self.ALSpeechRecognitionService.subscribe("isHearing")
+            self.ALSpeechRecognitionService.pause(False)
         else:
             self.ALSpeechRecognitionService.unsubscribe("isHearing")
+            self.ALSpeechRecognitionService.pause(True)
         self.ALSpeechRecognitionService.setAudioExpression(req.noise)
         self.ALSpeechRecognitionService.setVisualExpression(req.eyes)
         return "OK"
@@ -499,7 +523,10 @@ class PyToolkit:
     def on_Perception_Tshirt(self, id):
         self.id = id 
         
-    
+    def on_ObstacleDetection(self, value):
+        print(value)
+        #self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(value))
+        
     def on_move(self, msg):
         print(consoleFormatter.format("\nRequested ALMotion/move", "WARNING"))
         if (msg.linear.x==0) and (msg.linear.y==0) and (msg.angular.z==0):
