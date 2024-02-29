@@ -179,6 +179,9 @@ class PyToolkit:
         self.y = 0
         self.theta = 0
 
+        # Probability threshold for publishing to the topic
+        self.threshold
+
         # Service ROS Servers - ALPerception
         
         #self.Server = rospy.Service('pytoolkit/ALPerception/Tshirt_color_srv', Tshirt_color_srv, self.callback_Tshirt_color__srv)
@@ -207,9 +210,10 @@ class PyToolkit:
     # ----------------------------------------------------ALAudioDevice------------------------------------------------------
     
     def callback_set_words_srv(self, req):
-	self.ALSpeechRecognitionService.pause(True)
+        self.ALSpeechRecognitionService.pause(True)
         self.ALSpeechRecognitionService.setVocabulary(req.words,False)
-	self.ALSpeechRecognitionService.pause(False)
+        self.threshold = req.threshold
+        self.ALSpeechRecognitionService.pause(False)
         return "OK"
     
     def callback_set_speechrecognition_srv(self, req):
@@ -519,11 +523,10 @@ class PyToolkit:
         self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(idOfConcernedTask, status))
 
     def on_speech_recognition_status(self, value):
-	print(value)
         word = value[0]
-	number = value[1]
-	if number>0.4:
-		self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
+        number = value[1]
+        if number>self.threshold:
+            self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
 
     def on_Perception_Tshirt(self, id):
         self.id = id 
