@@ -8,7 +8,7 @@ import rospkg
 import math
 import argparse
 import sys
-from robot_toolkit_msgs.srv import Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
+from robot_toolkit_msgs.srv import set_words_threshold_srv, Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse
 from geometry_msgs.msg import Twist
@@ -85,7 +85,7 @@ class PyToolkit:
         self.audioHearingServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_speechrecognition_srv', set_speechrecognition_srv, self.callback_set_speechrecognition_srv)
         print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
 
-        self.wordsServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_words_srv', speech_recognition_srv, self.callback_set_words_srv)
+        self.wordsServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_words_srv', set_words_threshold_srv, self.callback_set_words_srv)
         print(consoleFormatter.format('ALSpeechRecognition/set_words_srv on!', 'OKGREEN'))
 
 
@@ -180,7 +180,8 @@ class PyToolkit:
         self.theta = 0
 
         # Probability threshold for publishing to the topic
-        self.threshold
+        self.threshold = []
+        self.words = []
 
         # Service ROS Servers - ALPerception
         
@@ -212,6 +213,7 @@ class PyToolkit:
     def callback_set_words_srv(self, req):
         self.ALSpeechRecognitionService.pause(True)
         self.ALSpeechRecognitionService.setVocabulary(req.words,False)
+        self.words = req.words
         self.threshold = req.threshold
         self.ALSpeechRecognitionService.pause(False)
         return "OK"
@@ -525,7 +527,8 @@ class PyToolkit:
     def on_speech_recognition_status(self, value):
         word = value[0]
         number = value[1]
-        if number>self.threshold:
+        index = self.words.index("word")
+        if number>self.threshold[index]:
             self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
 
     def on_Perception_Tshirt(self, id):
