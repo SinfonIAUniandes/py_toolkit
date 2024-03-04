@@ -527,9 +527,12 @@ class PyToolkit:
     def on_speech_recognition_status(self, value):
         word = value[0]
         number = value[1]
-        index = self.words.index("word")
-        if number>self.threshold[index]:
-            self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
+	try:
+       		index = self.words.index(word)
+        	if number>self.threshold[index]:
+            		self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
+	except ValueError:
+		print("word not in list")
 
     def on_Perception_Tshirt(self, id):
         self.id = id 
