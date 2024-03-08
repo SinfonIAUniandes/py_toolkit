@@ -75,6 +75,8 @@ class PyToolkit:
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
         self.ALBatteryService = session.service("ALBattery")
+        self.ALAudioPlayer = session.service("ALAudioPlayer")
+
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
