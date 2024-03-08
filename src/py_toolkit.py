@@ -10,7 +10,7 @@ import argparse
 import sys
 from robot_toolkit_msgs.srv import set_words_threshold_srv, Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
-from std_srvs.srv import SetBool, SetBoolResponse, String 
+from std_srvs.srv import SetBool, SetBoolResponse 
 from geometry_msgs.msg import Twist
 import ConsoleFormatter
 
@@ -88,7 +88,7 @@ class PyToolkit:
         self.wordsServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_words_srv', set_words_threshold_srv, self.callback_set_words_srv)
         print(consoleFormatter.format('ALSpeechRecognition/set_words_srv on!', 'OKGREEN'))
 
-        self.languageServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_hot_word_language_srv', String , self.callback_set_hot_word_language)
+        self.languageServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_hot_word_language_srv', tablet_service_srv , self.callback_set_hot_word_language)
         print(consoleFormatter.format('ALSpeechRecognition/set_hot_word_language_srv on!', 'OKGREEN'))
 
 
@@ -223,6 +223,7 @@ class PyToolkit:
     
     def callback_set_hot_word_language(self,req):
         self.ALSpeechRecognitionService.setLanguage(self.language)
+        return tablet_service_srvResponse("OK")
 
     def callback_set_speechrecognition_srv(self, req):
         self.ALSpeechRecognitionService.pause(True)
