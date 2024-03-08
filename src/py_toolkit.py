@@ -90,8 +90,11 @@ class PyToolkit:
         self.wordsServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_words_srv', set_words_threshold_srv, self.callback_set_words_srv)
         print(consoleFormatter.format('ALSpeechRecognition/set_words_srv on!', 'OKGREEN'))
 
-        self.languageServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_hot_word_language_srv', tablet_service_srv , self.callback_set_hot_word_language)
+        self.languageServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_hot_word_language_srv', tablet_service_srv , self.callback_set_hot_word_language_srv)
         print(consoleFormatter.format('ALSpeechRecognition/set_hot_word_language_srv on!', 'OKGREEN'))
+
+        self.playSoundEffect = rospy.Service('pytoolkit/ALAudioPlayer/play_sound_effect_srv', tablet_service_srv , self.callback_play_sound_effect_srv)
+        print(consoleFormatter.format('ALAudioPlayer/play_sound_effect_srv on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALAutonomousLife
@@ -228,7 +231,7 @@ class PyToolkit:
         self.ALSpeechRecognitionService.pause(False)
         return "OK"
     
-    def callback_set_hot_word_language(self,req):
+    def callback_set_hot_word_language_srv(self,req):
         self.ALSpeechRecognitionService.pause(True)
         self.ALSpeechRecognitionService.setLanguage(req.url)
         self.ALSpeechRecognitionService.pause(False)
@@ -246,6 +249,9 @@ class PyToolkit:
         self.ALSpeechRecognitionService.setVisualExpression(req.eyes)
         return "OK"
     
+    def callback_play_sound_effect_srv(self, req):
+        self.ALAudioPlayer.playSoundSetFile(req.url)
+        return tablet_service_srvResponse("OK")
 
     def callback_play_audio_stream_srv(self, req):
         print(consoleFormatter.format("\nRequested ALAudioPlayer/play_audio_stream_srv", "WARNING"))
