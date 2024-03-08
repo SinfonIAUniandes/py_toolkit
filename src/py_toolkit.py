@@ -125,6 +125,8 @@ class PyToolkit:
         self.motionToggleBreathing = rospy.Service('pytoolkit/ALMotion/toggle_breathing_srv', set_open_close_hand_srv, self.callback_toggle_breathing_srv)
         print(consoleFormatter.format('toggle_breathing_srv on!', 'OKGREEN'))
 
+        #push test
+
         self.motionMoveHeadServer = rospy.Service('pytoolkit/ALMotion/move_head_srv', move_head_srv, self.callback_motion_move_head_srv)
         print(consoleFormatter.format('Move_head_srv on!', 'OKGREEN'))
 
