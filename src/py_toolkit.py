@@ -514,6 +514,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTracker/stop_tracker_srv", "WARNING"))
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
         self.ALTrackerService.setMaximumDistanceDetection(0.1)
+        self.ALTrackerService.stopTracker()
         print(consoleFormatter.format('Tracker has stopped!', 'OKGREEN'))
         return "OK"
 
@@ -522,6 +523,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTracker/start_tracker_srv", "WARNING"))
         self.callback_motion_move_head_srv(move_head_srvRequest("default"))
         self.ALTrackerService.setMaximumDistanceDetection(3.5)
+        self.ALTrackerService.initialize()
         print(consoleFormatter.format('Tracker has started!', 'OKGREEN'))
         return "OK"
     
@@ -536,12 +538,12 @@ class PyToolkit:
     def on_speech_recognition_status(self, value):
         word = value[0]
         number = value[1]
-	try:
-       		index = self.words.index(word)
-        	if number>self.threshold[index]:
-            		self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
-	except ValueError:
-		print("word not in list")
+        try:
+            index = self.words.index(word)
+            if number>self.threshold[index]:
+                self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
+        except ValueError:
+            print("word not in list")
 
     def on_Perception_Tshirt(self, id):
         self.id = id 
@@ -595,6 +597,7 @@ if __name__ == '__main__':
         pytoolkit.ALBasicAwareness.pauseAwareness()
         pytoolkit.ALBasicAwareness.stopAwareness()
         pytoolkit.ALTrackerService.setMaximumDistanceDetection(0.1)
+        pytoolkit.ALTrackerService.stopTracker()
         print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         print("overloading tablet...")
         for i in range(10):
