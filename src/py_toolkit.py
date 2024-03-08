@@ -75,6 +75,8 @@ class PyToolkit:
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
         self.ALBatteryService = session.service("ALBattery")
+        self.ALAudioPlayer = session.service("ALAudioPlayer")
+
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -88,8 +90,14 @@ class PyToolkit:
         self.wordsServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_words_srv', set_words_threshold_srv, self.callback_set_words_srv)
         print(consoleFormatter.format('ALSpeechRecognition/set_words_srv on!', 'OKGREEN'))
 
-        self.languageServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_hot_word_language_srv', tablet_service_srv , self.callback_set_hot_word_language)
+        self.languageServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_hot_word_language_srv', tablet_service_srv , self.callback_set_hot_word_language_srv)
         print(consoleFormatter.format('ALSpeechRecognition/set_hot_word_language_srv on!', 'OKGREEN'))
+
+        self.playSoundEffect = rospy.Service('pytoolkit/ALAudioPlayer/play_sound_effect_srv', tablet_service_srv , self.callback_play_sound_effect_srv)
+        print(consoleFormatter.format('ALAudioPlayer/play_sound_effect_srv on!', 'OKGREEN'))
+
+        self.followFace = rospy.Service('pytoolkit/ALTracker/start_follow_face', battery_service_srv , self.callback_start_follow_face_srv)
+        print(consoleFormatter.format('ALTracker/start_follow_face on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALAutonomousLife
@@ -126,6 +134,11 @@ class PyToolkit:
         self.motionSetStiffnessesServer = rospy.Service('pytoolkit/ALMotion/set_stiffnesses_srv', set_stiffnesses_srv, self.callback_set_stiffnesses_srv)
         print(consoleFormatter.format('set_stiffnesses_srv on!', 'OKGREEN'))
 
+        self.playAudioStreamServer = rospy.Service('pytoolkit/ALAudioPlayer/play_audio_stream_srv', set_stiffnesses_srv, self.callback_play_audio_stream_srv)
+        print(consoleFormatter.format('play_audio_stream_srv on!', 'OKGREEN'))
+
+        self.stopAudioServer = rospy.Service('pytoolkit/ALAudioPlayer/stop_audio_stream_srv', battery_service_srv, self.callback_stop_audio_stream_srv)
+        print(consoleFormatter.format('stop_audio_stream_srv on!', 'OKGREEN'))
 
         # Service ROS Servers - ALNavigation
         self.navigationNavigateToServer = rospy.Service('pytoolkit/ALNavigation/navigate_to_srv', navigate_to_srv, self.callback_navigation_navigate_to_srv)
@@ -221,7 +234,7 @@ class PyToolkit:
         self.ALSpeechRecognitionService.pause(False)
         return "OK"
     
-    def callback_set_hot_word_language(self,req):
+    def callback_set_hot_word_language_srv(self,req):
         self.ALSpeechRecognitionService.pause(True)
         self.ALSpeechRecognitionService.setLanguage(req.url)
         self.ALSpeechRecognitionService.pause(False)
@@ -239,6 +252,23 @@ class PyToolkit:
         self.ALSpeechRecognitionService.setVisualExpression(req.eyes)
         return "OK"
     
+    def callback_play_sound_effect_srv(self, req):
+        self.ALAudioPlayer.playSoundSetFile(req.url)
+        return tablet_service_srvResponse("OK")
+
+    def callback_play_audio_stream_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALAudioPlayer/play_audio_stream_srv", "WARNING"))
+        self.ALAudioPlayer.playWebStream(req.names, req.stiffnesses,0)
+        print(consoleFormatter.format('Stream played!', 'OKGREEN'))
+        return set_stiffnesses_srvResponse("OK") 
+    
+
+    def callback_stop_audio_stream_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALAudioPlayer/stop_audio_stream_srv", "WARNING"))
+        self.ALAudioPlayer.stopAll()
+        print(consoleFormatter.format('Stream stopped!', 'OKGREEN'))
+        return str("OK") 
+
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
 
     def callback_autonomous_set_state_srv(self, req):
@@ -527,6 +557,18 @@ class PyToolkit:
         print(consoleFormatter.format('Tracker has started!', 'OKGREEN'))
         return "OK"
     
+    def callback_start_follow_face_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTracker/start_follow_face_srv", "WARNING"))
+        self.callback_motion_move_head_srv(move_head_srvRequest("default"))
+        self.ALTrackerService.setMaximumDistanceDetection(3.5)
+        self.ALTrackerService.initialize()
+        self.ALTrackerService.setMode("Move")
+        self.ALTrackerService.registerTarget("Face",0.2)
+        self.ALTrackerService.track("Face")
+        print(consoleFormatter.format('Follow Face has started!', 'OKGREEN'))
+        return "OK"
+
+
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
     # -----------------------------------------------------------------------------------------------------------------------
