@@ -12,6 +12,7 @@ from robot_toolkit_msgs.srv import set_words_threshold_srv, Tshirt_color_srv, ta
 from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
 from std_srvs.srv import SetBool, SetBoolResponse
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String 
 import ConsoleFormatter
 
 class PyToolkit:
@@ -87,6 +88,9 @@ class PyToolkit:
 
         self.wordsServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_words_srv', set_words_threshold_srv, self.callback_set_words_srv)
         print(consoleFormatter.format('ALSpeechRecognition/set_words_srv on!', 'OKGREEN'))
+
+        self.languageServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_hot_word_language_srv', String , self.callback_set_hot_word_language)
+        print(consoleFormatter.format('ALSpeechRecognition/set_hot_word_language_srv on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALAutonomousLife
@@ -218,6 +222,9 @@ class PyToolkit:
         self.ALSpeechRecognitionService.pause(False)
         return "OK"
     
+    def callback_set_hot_word_language(self,req):
+        self.ALSpeechRecognitionService.setLanguage(self.language)
+
     def callback_set_speechrecognition_srv(self, req):
         self.ALSpeechRecognitionService.pause(True)
         if req.subscribe:
