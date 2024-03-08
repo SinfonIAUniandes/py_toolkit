@@ -126,6 +126,11 @@ class PyToolkit:
         self.motionSetStiffnessesServer = rospy.Service('pytoolkit/ALMotion/set_stiffnesses_srv', set_stiffnesses_srv, self.callback_set_stiffnesses_srv)
         print(consoleFormatter.format('set_stiffnesses_srv on!', 'OKGREEN'))
 
+        self.playAudioStreamServer = rospy.Service('pytoolkit/ALAudioPlayer/play_audio_stream_srv', set_stiffnesses_srv, self.callback_play_audio_stream_srv)
+        print(consoleFormatter.format('play_audio_stream_srv on!', 'OKGREEN'))
+
+        self.stopAudioServer = rospy.Service('pytoolkit/ALAudioPlayer/stop_audio_stream_srv', battery_service_srv, self.callback_stop_audio_stream_srv)
+        print(consoleFormatter.format('stop_audio_stream_srv on!', 'OKGREEN'))
 
         # Service ROS Servers - ALNavigation
         self.navigationNavigateToServer = rospy.Service('pytoolkit/ALNavigation/navigate_to_srv', navigate_to_srv, self.callback_navigation_navigate_to_srv)
@@ -239,6 +244,20 @@ class PyToolkit:
         self.ALSpeechRecognitionService.setVisualExpression(req.eyes)
         return "OK"
     
+
+    def callback_play_audio_stream_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALAudioPlayer/play_audio_stream_srv", "WARNING"))
+        self.ALAudioPlayer.playWebStream(req.names, req.stiffnesses,0)
+        print(consoleFormatter.format('Stream played!', 'OKGREEN'))
+        return set_stiffnesses_srvResponse("OK") 
+    
+
+    def callback_stop_audio_stream_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALAudioPlayer/stop_audio_stream_srv", "WARNING"))
+        self.ALAudioPlayer.stopAll()
+        print(consoleFormatter.format('Stream stopped!', 'OKGREEN'))
+        return str("OK") 
+
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
 
     def callback_autonomous_set_state_srv(self, req):
