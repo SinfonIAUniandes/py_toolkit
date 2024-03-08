@@ -122,6 +122,9 @@ class PyToolkit:
         self.motionSetOpenCloseHandServer = rospy.Service('pytoolkit/ALMotion/set_open_close_hand_srv', set_open_close_hand_srv, self.callback_motion_set_open_close_hand_srv)
         print(consoleFormatter.format('Set_open_close_hand_srv on!', 'OKGREEN'))
 
+        self.motionToggleBreathing = rospy.Service('pytoolkit/ALMotion/toggle_breathing_srv', set_open_close_hand_srv, self.callback_toggle_breathing_srv)
+        print(consoleFormatter.format('toggle_breathing_srv on!', 'OKGREEN'))
+
         self.motionMoveHeadServer = rospy.Service('pytoolkit/ALMotion/move_head_srv', move_head_srv, self.callback_motion_move_head_srv)
         print(consoleFormatter.format('Move_head_srv on!', 'OKGREEN'))
 
@@ -317,6 +320,16 @@ class PyToolkit:
         self.ALBasicAwareness.resumeAwareness()
         print(consoleFormatter.format('Awareness is resumed!', 'OKGREEN'))
         return "OK"
+
+    def callback_toggle_breathing_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/toggle_breathing_srv", "WARNING"))
+        if req.hand == "True":
+            #Body for example
+            self.ALMotion.setBreathEnabled(req.hand,True)
+        if req.hand == "False":
+            #Body for example
+            self.ALMotion.setBreathEnabled(req.hand,False)
+        return set_open_close_hand_srvResponse("OK")
 
     # ----------------------------------------------------ALMotion------------------------------------------------
 
