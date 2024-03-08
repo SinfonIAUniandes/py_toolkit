@@ -96,6 +96,9 @@ class PyToolkit:
         self.playSoundEffect = rospy.Service('pytoolkit/ALAudioPlayer/play_sound_effect_srv', tablet_service_srv , self.callback_play_sound_effect_srv)
         print(consoleFormatter.format('ALAudioPlayer/play_sound_effect_srv on!', 'OKGREEN'))
 
+        self.followFace = rospy.Service('pytoolkit/ALTracker/start_follow_face', battery_service_srv , self.callback_start_follow_face_srv)
+        print(consoleFormatter.format('ALTracker/start_follow_face on!', 'OKGREEN'))
+
 
         # Service ROS Servers - ALAutonomousLife
         self.autonomousSetStateServer = rospy.Service('pytoolkit/ALAutonomousLife/set_state_srv', SetBool, self.callback_autonomous_set_state_srv)
@@ -554,6 +557,18 @@ class PyToolkit:
         print(consoleFormatter.format('Tracker has started!', 'OKGREEN'))
         return "OK"
     
+    def callback_start_follow_face_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTracker/start_follow_face_srv", "WARNING"))
+        self.callback_motion_move_head_srv(move_head_srvRequest("default"))
+        self.ALTrackerService.setMaximumDistanceDetection(3.5)
+        self.ALTrackerService.initialize()
+        self.ALTrackerService.setMode("Move")
+        self.ALTrackerService.registerTarget("Face",0.2)
+        self.ALTrackerService.track("Face")
+        print(consoleFormatter.format('Follow Face has started!', 'OKGREEN'))
+        return "OK"
+
+
     # -----------------------------------------------------------------------------------------------------------------------
     # -----------------------------------------------------EVENTS CALLBACKS--------------------------------------------------
     # -----------------------------------------------------------------------------------------------------------------------
