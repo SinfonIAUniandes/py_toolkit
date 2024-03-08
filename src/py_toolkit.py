@@ -318,6 +318,16 @@ class PyToolkit:
         print(consoleFormatter.format('Awareness is resumed!', 'OKGREEN'))
         return "OK"
 
+    def callback_toggle_breathing_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/toggle_breathing_srv", "WARNING"))
+        if req.hand == "True":
+            #Body for example
+            self.ALMotion.setBreathEnabled(req.hand,True)
+        if req.hand == "False":
+            #Body for example
+            self.ALMotion.setBreathEnabled(req.hand,False)
+        return set_open_close_hand_srvResponse("OK")
+
     # ----------------------------------------------------ALMotion------------------------------------------------
 
     def callback_motion_set_security_distance_srv(self, req):
