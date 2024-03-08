@@ -222,7 +222,9 @@ class PyToolkit:
         return "OK"
     
     def callback_set_hot_word_language(self,req):
+        self.ALSpeechRecognitionService.pause(True)
         self.ALSpeechRecognitionService.setLanguage(req.url)
+        self.ALSpeechRecognitionService.pause(False)
         return tablet_service_srvResponse("OK")
 
     def callback_set_speechrecognition_srv(self, req):
