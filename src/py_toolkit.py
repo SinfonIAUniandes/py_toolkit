@@ -180,6 +180,9 @@ class PyToolkit:
         self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', battery_service_srv, self.callback_tablet_hide_srv)
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
 
+        self.enableSecurityServer = rospy.Service('pytoolkit/ALMotion/enable_security_srv', battery_service_srv, self.callback_motion_enable_security_srv)
+        print(consoleFormatter.format('enable_security_srv on!', 'OKGREEN'))    
+
         self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', battery_service_srv, self.callback_tablet_overload_srv)
         print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))
 
@@ -325,10 +328,10 @@ class PyToolkit:
 
     def callback_toggle_breathing_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/toggle_breathing_srv", "WARNING"))
-        if req.hand == "True":
+        if req.state == "True":
             #Body for example
             self.ALMotion.setBreathEnabled(req.hand,True)
-        if req.hand == "False":
+        if req.state == "False":
             #Body for example
             self.ALMotion.setBreathEnabled(req.hand,False)
         return set_open_close_hand_srvResponse("OK")
@@ -344,6 +347,15 @@ class PyToolkit:
         print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
         return set_security_distance_srvResponse("OK")
     
+    def callback_motion_enable_security_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/enable_security_srv", "WARNING"))
+        self.ALMotion.setOrthogonalSecurityDistance(0.4)
+        self.ALMotion.setTangentialSecurityDistance(0.1)
+        self.ALMotion.setCollisionProtectionEnabled("Arms", True)
+        self.ALMotion.setExternalCollisionProtectionEnabled("All", True)
+        print(consoleFormatter.format('Security distance was enabled', 'OKGREEN'))
+        return str("OK")
+
     def callback_motion_set_open_close_hand_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/open_close_hand_srv", "WARNING"))
         if req.hand == "left" or req.hand == "both":
