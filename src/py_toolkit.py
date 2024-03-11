@@ -32,6 +32,9 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
 
+        self.ALSpeechRecognitionDetectedPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/SpeechDetected', speech_recognition_status_msg, queue_size=10)
+        print(consoleFormatter.format("ALSpeechRecognition/SpeechDetected topic is up!","OKGREEN"))
+
         self.ALSensorsPublisher = rospy.Publisher('/pytoolkit/ALSensors/obstacles', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSensors/obstacles topic is up!","OKGREEN"))
 
@@ -46,6 +49,9 @@ class PyToolkit:
         
         self.ALSpeechRecognitionSubscriber = self.ALMemory.subscriber("WordRecognized")
         self.ALSpeechRecognitionSubscriber.signal.connect(self.on_speech_recognition_status)
+        
+        self.ALSpeechDetectedSubscriber = self.ALMemory.subscriber("SpeechDetected")
+        self.ALSpeechDetectedSubscriber.signal.connect(self.on_speech_recognition_detected)
 
         # Perception Subscriber
         self.ALPeoplePerceptionSubscriber = self.ALMemory.subscriber("PeoplePerception/JustArrived")
@@ -611,6 +617,12 @@ class PyToolkit:
                 self.ALSpeechRecognitionStatusPublisher.publish(speech_recognition_status_msg(word))
         except ValueError:
             print("word not in list")
+
+    def on_speech_recognition_detected(self, value):
+        if value==0:
+            self.ALSpeechRecognitionDetectedPublisher.publish(speech_recognition_status_msg("stopped"))
+        if value==1:
+            self.ALSpeechRecognitionDetectedPublisher.publish(speech_recognition_status_msg("started"))
 
     def on_Perception_Tshirt(self, id):
         self.id = id 
