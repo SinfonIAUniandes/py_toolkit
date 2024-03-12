@@ -437,13 +437,13 @@ class PyToolkit:
     
     def callback_start_exploring_srv(self, req):
         print(consoleFormatter.format("\nRequested ALNavigation/start_exploring_srv", "WARNING"))
-        self.ALMotion.explore(req.volume)
+        self.ALNavigation.explore(req.volume)
         print(consoleFormatter.format('Robot is exploring the surrounding'+str(req.volume)+'meters', 'OKGREEN'))
         return navigate_to_srvResponse("OK")
 
     def callback_stop_exploring_srv(self, req):
         print(consoleFormatter.format("\nRequested ALNavigation/stop_exploring_srv", "WARNING"))
-        self.ALMotion.stopExploration(req.volume)
+        self.ALNavigation.stopExploration(req.volume)
         print(consoleFormatter.format('Robot has stopped exploring the surrounding meters', 'OKGREEN'))
         return navigate_to_srvResponse("OK")
     
