@@ -152,6 +152,10 @@ class PyToolkit:
         # Service ROS Servers - ALNavigation
         self.navigationNavigateToServer = rospy.Service('pytoolkit/ALNavigation/navigate_to_srv', navigate_to_srv, self.callback_navigation_navigate_to_srv)
         print(consoleFormatter.format('Navigate_to_srv on!', 'OKGREEN'))
+        self.navigationStartExploringServer = rospy.Service('pytoolkit/ALNavigation/start_exploring_srv', set_output_volume_srv, self.callback_start_exploring_srv)
+        print(consoleFormatter.format('start_exploring_srv on!', 'OKGREEN'))
+        self.navigationStopExploringServer = rospy.Service('pytoolkit/ALNavigation/stop_exploring_srv', battery_service_srv, self.callback_stop_exploring_srv)
+        print(consoleFormatter.format('stop_exploring_srv on!', 'OKGREEN'))
 
         
         # Service ROS Servers - ALRobotPosture
@@ -431,7 +435,17 @@ class PyToolkit:
         print(consoleFormatter.format('Robot is navigating to the given coordinates!', 'OKGREEN'))
         return navigate_to_srvResponse("OK")
     
+    def callback_start_exploring_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALNavigation/start_exploring_srv", "WARNING"))
+        self.ALMotion.explore(req.volume)
+        print(consoleFormatter.format('Robot is exploring the surrounding'+str(req.volume)+'meters', 'OKGREEN'))
+        return navigate_to_srvResponse("OK")
 
+    def callback_stop_exploring_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALNavigation/stop_exploring_srv", "WARNING"))
+        self.ALMotion.stopExploration(req.volume)
+        print(consoleFormatter.format('Robot has stopped exploring the surrounding meters', 'OKGREEN'))
+        return navigate_to_srvResponse("OK")
     
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
     
