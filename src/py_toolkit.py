@@ -42,6 +42,9 @@ class PyToolkit:
         self.ALMotionMovePublisher = rospy.Subscriber('/pytoolkit/ALMotion/move', Twist, self.on_move)
         print(consoleFormatter.format("ALMotion/move subscriber is up!","OKGREEN"))
 
+        self.speechSubscriber=rospy.Subscriber("/speech", speech_msg, self.on_words)
+        print(consoleFormatter.format("/speech subscriber is up!","OKGREEN"))
+
         self.ALMemory = session.service("ALMemory")
         
         self.ALTextToSpeechStatusSubscriber = self.ALMemory.subscriber("ALTextToSpeech/Status")
@@ -184,6 +187,9 @@ class PyToolkit:
 
         self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/get_input_srv', get_input_srv, self.callback_tablet_get_input_srv)
         print(consoleFormatter.format('Get_input_srv on!', 'OKGREEN'))  
+
+        self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/show_words_srv', get_input_srv, self.callback_tablet_show_words_srv)
+        print(consoleFormatter.format('Show_words_srv on!', 'OKGREEN'))  
 
         self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', battery_service_srv, self.callback_tablet_hide_srv)
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
@@ -503,7 +509,7 @@ class PyToolkit:
 
     def callback_tablet_topic_srv(self, req):
         ip=open(self.PYTOOLKIT_FOLDER+"/resources/topic_srv.txt","r").read()
-        print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
+        print(consoleFormatter.format("\nRequested ALTabletService/show_topic_srv", "WARNING"))
         self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
         time.sleep(3)
         script = """
@@ -528,7 +534,7 @@ class PyToolkit:
 
     def callback_tablet_get_input_srv(self, req):
         self.input=""
-        print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
+        print(consoleFormatter.format("\nRequested ALTabletService/show_get_input_srv", "WARNING"))
         #text es un textbox donde la persona ingresa informacion
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
@@ -557,6 +563,12 @@ class PyToolkit:
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
         self.promise=qi.Promise()
         return self.input
+
+    def callback_tablet_show_words_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTabletService/show_words_srv", "WARNING"))
+        self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
+        print(consoleFormatter.format('Showing words in tablet!', 'OKGREEN'))
+        return tablet_service_srvResponse("OK")
     
 
     def callback_tablet_play_video_srv(self, req):
@@ -660,6 +672,24 @@ class PyToolkit:
             self.y = msg.linear.y
             self.theta = msg.angular.z
             self.ALMotion.move(msg.linear.x, msg.linear.y, msg.angular.z)
+        
+    def on_words(self, msg):
+        words = "["+msg.text+"]"
+        script = """
+        const palabras = +++;
+        const outputDiv = document.getElementById('output');
+
+        let textoConcatenado = '';
+
+        for (let i = 0; i < palabras.length; i++) {
+            setTimeout(() => {
+                textoConcatenado += palabras[i] + ' ';
+                outputDiv.innerText = textoConcatenado;
+            }, 1000);
+        }
+        outputDiv.innerText = "";
+        """.replace("+++",words)
+        self.ALTabletService.executeJS(script)
             
         
         
