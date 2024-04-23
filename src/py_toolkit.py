@@ -188,7 +188,7 @@ class PyToolkit:
         self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/get_input_srv', get_input_srv, self.callback_tablet_get_input_srv)
         print(consoleFormatter.format('Get_input_srv on!', 'OKGREEN'))  
 
-        self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/show_words_srv', get_input_srv, self.callback_tablet_show_words_srv)
+        self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/show_words_srv', battery_service_srv, self.callback_tablet_show_words_srv)
         print(consoleFormatter.format('Show_words_srv on!', 'OKGREEN'))  
 
         self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', battery_service_srv, self.callback_tablet_hide_srv)
@@ -568,7 +568,7 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTabletService/show_words_srv", "WARNING"))
         self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
         print(consoleFormatter.format('Showing words in tablet!', 'OKGREEN'))
-        return tablet_service_srvResponse("OK")
+        return "OK"
     
 
     def callback_tablet_play_video_srv(self, req):
