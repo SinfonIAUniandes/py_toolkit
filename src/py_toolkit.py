@@ -221,8 +221,10 @@ class PyToolkit:
         self.threshold = []
         self.words = []
 
-        # Service ROS Servers - ALPerception
-        
+        # Variable for show_words service
+        self.showing_words = False
+
+        # Service ROS Servers - ALPerception        
         #self.Server = rospy.Service('pytoolkit/ALPerception/Tshirt_color_srv', Tshirt_color_srv, self.callback_Tshirt_color__srv)
         #print(consoleFormatter.format('Tshirt_color__srv!', 'OKGREEN')) 
 
@@ -495,6 +497,7 @@ class PyToolkit:
 
     def callback_tablet_show_image_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
+        self.showing_words = False
         self.ALTabletService.showImage(req.url)
         time.sleep(1)
         print(consoleFormatter.format('Image shown!', 'OKGREEN'))
@@ -503,11 +506,13 @@ class PyToolkit:
 
     def callback_tablet_show_web_view_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
+        self.showing_words = False
         self.ALTabletService.showWebview(req.url)
         print(consoleFormatter.format('Web view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
     def callback_tablet_topic_srv(self, req):
+        self.showing_words = False
         ip=open(self.PYTOOLKIT_FOLDER+"/resources/topic_srv.txt","r").read()
         print(consoleFormatter.format("\nRequested ALTabletService/show_topic_srv", "WARNING"))
         self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
@@ -533,6 +538,7 @@ class PyToolkit:
         self.promise.setValue(True)
 
     def callback_tablet_get_input_srv(self, req):
+        self.showing_words = False
         self.input=""
         print(consoleFormatter.format("\nRequested ALTabletService/show_get_input_srv", "WARNING"))
         #text es un textbox donde la persona ingresa informacion
@@ -566,6 +572,7 @@ class PyToolkit:
 
     def callback_tablet_show_words_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_words_srv", "WARNING"))
+        self.showing_words = True
         self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
         print(consoleFormatter.format('Showing words in tablet!', 'OKGREEN'))
         return "OK"
@@ -573,6 +580,7 @@ class PyToolkit:
 
     def callback_tablet_play_video_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/play_video_srv", "WARNING"))
+        self.showing_words = False
         self.ALTabletService.playVideo(req.url)
         print(consoleFormatter.format('Video played!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
@@ -580,11 +588,13 @@ class PyToolkit:
 
     def callback_tablet_hide_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/hide_srv", "WARNING"))
+        self.showing_words = False
         self.ALTabletService.hide()
         print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
         return "OK"
 
     def callback_tablet_overload_srv(self, req):
+        self.showing_words = False
         for i in range(10):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1.5)
@@ -674,23 +684,30 @@ class PyToolkit:
             self.ALMotion.move(msg.linear.x, msg.linear.y, msg.angular.z)
         
     def on_words(self, msg):
-	script = """
-        const palabras = "+++".split(" ");
-	const outputDiv = document.getElementById('output');
-	let textoConcatenado = '';
+        if self.showing_words:
+            script = """
+            const palabras = "+++".split(" ");
+            const outputDiv = document.getElementById('output');
+            let textoConcatenado = '';
 
-	palabras.forEach((palabra, index) => {
-    		setTimeout(() => {
-        		textoConcatenado += palabra + ' ';
-        		outputDiv.innerText = textoConcatenado;
-    		}, 1000);
-	});
+            for (let i = 0; i < palabras.length; i++) {
+                setTimeout(() => {
+                    textoConcatenado += palabras[i] + ' ';
+                    outputDiv.innerText = textoConcatenado;
+                }, 1000 * i);
+            }
 
-	setTimeout(() => {
-   		 outputDiv.innerText = "";
-	}, 10000);
-        """.replace("+++",msg.text.replace("\\","").replace("rspd=",""))
-        self.ALTabletService.executeJS(script)
+            setTimeout(() => {
+                outputDiv.innerText = "";
+            }, 10000);
+            """
+            if "rspd" in msg.text:
+                for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
+                    if not caracter.isdigit():
+                        nuevo_string = msg.text.replace("\\","").replace("rspd=","")[i:]
+                        break
+            script = script.replace("+++",nuevo_string)
+            self.ALTabletService.executeJS(script)
             
         
         
