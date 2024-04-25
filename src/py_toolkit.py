@@ -700,10 +700,17 @@ class PyToolkit:
 		outputDiv.innerText = "";
 		var words = palabras.split(" ");
 		textoConcatenado = words[0] + " ";
+        contador = 0;
 		function displayWords(index) {
 		    if (index < words.length) {
+            if (contador>=28){
+                textoConcatenado = ""; 
+                outputDiv.innerText = "";
+                contador = 0;
+            }
 			textoConcatenado = textoConcatenado.concat(" ",words[index]);
 			outputDiv.innerText = textoConcatenado;
+            contador++;
 			setTimeout(function() {
 			    displayWords(index + 1);
 			}, 250); 
