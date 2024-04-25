@@ -140,6 +140,9 @@ class PyToolkit:
         self.motionSetAngleServer = rospy.Service('pytoolkit/ALMotion/set_angle_srv', set_angle_srv, self.callback_motion_set_angle_srv)
         print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))  
 
+        self.motionGetAngleServer = rospy.Service('pytoolkit/ALMotion/get_angle_srv', get_segmentation3D_srv, self.callback_motion_get_angle_srv)
+        print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))
+
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
         print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
 
@@ -405,10 +408,16 @@ class PyToolkit:
     
     def callback_motion_set_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
-        self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
-        print(consoleFormatter.format('Angles set!', 'OKGREEN'))
+        response = get_segmentation3D_srvResponse()
+        response.coordinates = self.ALMotion.getAngles("Head",False)
         return set_angle_srvResponse("OK")
     
+    def callback_motion_get_angle_srv(self,req):
+        print(consoleFormatter.format("\nRequested ALMotion/get_angle_srv", "WARNING"))
+        self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
+        print(consoleFormatter.format('Angles set!', 'OKGREEN'))
+        return response
+
     def callback_motion_set_move_arms_enabled_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/set_move_arms_enabled_srv", "WARNING"))
         self.ALMotion.setMoveArmsEnabled(req.LArm, req.RArm)
