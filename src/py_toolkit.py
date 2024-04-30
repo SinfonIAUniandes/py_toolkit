@@ -81,6 +81,7 @@ class PyToolkit:
         self.ALSegmentation3D.subscribe("pytoolkit")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALPeoplePerception = session.service("ALPeoplePerception")
+        self.ALPhotoCapture = session.service("ALPhotoCapture")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
         self.ALBatteryService = session.service("ALBattery")
@@ -188,8 +189,11 @@ class PyToolkit:
         self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/get_input_srv', get_input_srv, self.callback_tablet_get_input_srv)
         print(consoleFormatter.format('Get_input_srv on!', 'OKGREEN'))  
 
-        self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/show_words_srv', battery_service_srv, self.callback_tablet_show_words_srv)
+        self.tabletShowWordsServer = rospy.Service('pytoolkit/ALTabletService/show_words_srv', battery_service_srv, self.callback_tablet_show_words_srv)
         print(consoleFormatter.format('Show_words_srv on!', 'OKGREEN'))  
+
+        self.tabletShowPicturesServer = rospy.Service('pytoolkit/ALTabletService/show_picture_srv', battery_service_srv, self.callback_tablet_show_picture_srv)
+        print(consoleFormatter.format('Show_picture_srv on!', 'OKGREEN'))  
 
         self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', battery_service_srv, self.callback_tablet_hide_srv)
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
@@ -576,7 +580,14 @@ class PyToolkit:
         self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
         print(consoleFormatter.format('Showing words in tablet!', 'OKGREEN'))
         return "OK"
-    
+
+    def callback_tablet_show_picture_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTabletService/show_picture_srv", "WARNING"))
+        self.showing_words = False
+        self.ALPhotoCapture.takePicture("/home/nao/.local/share/PackageManager/apps/robot-page/html/img/","picture.png")
+        self.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/picture.png")
+        print(consoleFormatter.format('Showing picture taken in tablet!', 'OKGREEN'))
+        return "OK"    
 
     def callback_tablet_play_video_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/play_video_srv", "WARNING"))
