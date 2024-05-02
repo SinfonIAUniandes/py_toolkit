@@ -152,4 +152,4 @@ def dance(ALMotion, ALAudioPlayer):
     
 def music(ALAudioPlayer):
     time.sleep(3)
-    ALAudioPlayer.playFile("/home/nao/ros_ws/toolkit_ws/src/py_toolkit/src/arcadia_30.wav")
+    ALAudioPlayer.playFile("/home/nao/ros_ws/toolkit_ws/src/py_toolkit/resources/arcadia_30.wav")
