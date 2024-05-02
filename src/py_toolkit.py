@@ -8,6 +8,7 @@ import rospkg
 import math
 import dance_arcadia
 import dance_hands
+import dance_asereje
 import argparse
 import sys
 from robot_toolkit_msgs.srv import set_words_threshold_srv, Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
@@ -303,10 +304,13 @@ class PyToolkit:
 
     def callback_play_dance_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/play_dance_srv", "WARNING"))
+        self.ALRobotPosture.goToPosture("Stand", 0.5)
         if req.volume==1:
             dance_arcadia.dance(self.ALMotion,self.ALAudioPlayer)
-        if req.volume==2:
+        elif req.volume==2:
             dance_hands.dance(self.ALMotion)
+        elif req.volume==3:
+            dance_asereje.dance(self.ALMotion,self.ALAudioPlayer)
         return str("OK") 
 
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
