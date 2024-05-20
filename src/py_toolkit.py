@@ -136,6 +136,12 @@ class PyToolkit:
         self.motionSetSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_security_distance_srv', set_security_distance_srv, self.callback_motion_set_security_distance_srv)    
         print(consoleFormatter.format('Set_security_distance_srv on!', 'OKGREEN'))
 
+        self.motionSetTangentialSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_tangential_security_distance_srv', set_security_distance_srv, self.callback_motion_set_tangential_security_distance_srv)    
+        print(consoleFormatter.format('set_tangential_security_distance_srv on!', 'OKGREEN'))
+
+        self.motionSetOrthogonalSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_orthogonal_security_distance_srv', set_security_distance_srv, self.callback_motion_set_orthogonal_security_distance_srv)    
+        print(consoleFormatter.format('set_orthogonal_security_distance_srv on!', 'OKGREEN'))
+
         self.motionSetOpenCloseHandServer = rospy.Service('pytoolkit/ALMotion/set_open_close_hand_srv', set_open_close_hand_srv, self.callback_motion_set_open_close_hand_srv)
         print(consoleFormatter.format('Set_open_close_hand_srv on!', 'OKGREEN'))
 
@@ -391,6 +397,16 @@ class PyToolkit:
         self.ALMotion.setCollisionProtectionEnabled("Arms", False)
         self.ALMotion.setExternalCollisionProtectionEnabled("All", False)
         print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
+        return set_security_distance_srvResponse("OK")
+
+    def callback_motion_set_tangential_security_distance_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_tangential_security_distance_srv", "WARNING"))
+        self.ALMotion.setTangentialSecurityDistance(req.distance)
+        return set_security_distance_srvResponse("OK")
+
+    def callback_motion_set_orthogonal_security_distance_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_orthogonal_security_distance_srv", "WARNING"))
+        self.ALMotion.setOrthogonalSecurityDistance(req.distance)
         return set_security_distance_srvResponse("OK")
     
     def callback_motion_enable_security_srv(self, req):
