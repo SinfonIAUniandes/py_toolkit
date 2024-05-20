@@ -95,10 +95,10 @@ class PyToolkit:
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
         print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
-        self.audioDeviceGetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/get_output_volume_srv', battery_service_srv, self.callback_shut_up_srv)
+        self.audioDeviceGetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/get_output_volume_srv', battery_service_srv, self.callback_audio_device_get_output_volume_srv)
         print(consoleFormatter.format('ALAudioDevice/get_output_volume_srv on!', 'OKGREEN'))
 
-        self.shutUpServer = rospy.Service('pytoolkit/ALTextToSpeech/shut_up_srv', battery_service_srv, self.callback_audio_device_set_output_volume_srv)
+        self.shutUpServer = rospy.Service('pytoolkit/ALTextToSpeech/shut_up_srv', battery_service_srv, self.callback_shut_up_srv)
         print(consoleFormatter.format('ALTextToSpeech/shut_up_srv on!', 'OKGREEN'))
 
         self.audioHearingServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_speechrecognition_srv', set_speechrecognition_srv, self.callback_set_speechrecognition_srv)
