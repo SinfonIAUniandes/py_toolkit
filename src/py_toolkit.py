@@ -781,6 +781,8 @@ if __name__ == '__main__':
     try:
         pytoolkit.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
         pytoolkit.ALAutonomousLife.setState("disabled")
+        # En teoria evita que el robot se le dañe el brazo
+        rospy.sleep(1)
         pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
         if pytoolkit.ALBasicAwareness.isEnabled():
             pytoolkit.ALBasicAwareness.setEnabled(False)
