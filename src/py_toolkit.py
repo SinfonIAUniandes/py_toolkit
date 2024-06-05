@@ -758,7 +758,7 @@ class PyToolkit:
             contador++;
 			setTimeout(function() {
 			    displayWords(index + 1);
-			}, 400); 
+			}, 450); 
 		    }
 		}
 
