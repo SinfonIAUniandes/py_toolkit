@@ -545,7 +545,11 @@ class PyToolkit:
     def callback_tablet_show_image_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
         self.showing_words = False
-        self.ALTabletService.showImage(req.url)
+        try:
+            self.ALTabletService.showImage(req.url)
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showImage(req.url)
         time.sleep(1)
         print(consoleFormatter.format('Image shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
@@ -554,7 +558,11 @@ class PyToolkit:
     def callback_tablet_show_web_view_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
         self.showing_words = False
-        self.ALTabletService.showWebview(req.url)
+        try:
+            self.ALTabletService.showWebview(req.url)
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview(req.url)
         print(consoleFormatter.format('Web view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
@@ -562,20 +570,37 @@ class PyToolkit:
         self.showing_words = False
         ip=open(self.PYTOOLKIT_FOLDER+"/resources/topic_srv.txt","r").read()
         print(consoleFormatter.format("\nRequested ALTabletService/show_topic_srv", "WARNING"))
-        self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
-        time.sleep(3)
-        script = """
-        var body = document.querySelector("body");
-        body.style.margin = "0";
-        body.style.backgroundColor = "#161616";
-        body.style.display = "flex";
-        body.style.justifyContent = "center";
-        var img = document.querySelector("img");
-        img.style.height = "614px";
-        var heading = document.querySelector("h1");
-        heading.innerHTML = "";
-        """
-        self.ALTabletService.executeJS(script)
+        try:
+            self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
+            time.sleep(3)
+            script = """
+            var body = document.querySelector("body");
+            body.style.margin = "0";
+            body.style.backgroundColor = "#161616";
+            body.style.display = "flex";
+            body.style.justifyContent = "center";
+            var img = document.querySelector("img");
+            img.style.height = "614px";
+            var heading = document.querySelector("h1");
+            heading.innerHTML = "";
+            """
+            self.ALTabletService.executeJS(script)
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
+            time.sleep(3)
+            script = """
+            var body = document.querySelector("body");
+            body.style.margin = "0";
+            body.style.backgroundColor = "#161616";
+            body.style.display = "flex";
+            body.style.justifyContent = "center";
+            var img = document.querySelector("img");
+            img.style.height = "614px";
+            var heading = document.querySelector("h1");
+            heading.innerHTML = "";
+            """
+            self.ALTabletService.executeJS(script)
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
@@ -591,36 +616,63 @@ class PyToolkit:
         #text es un textbox donde la persona ingresa informacion
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
+        html_file = ""
+        code_file = ""
         if req.type=="text":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
-            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigot.txt","r").read().replace("+++++",req.text)
+            html_file = "input1"
+            code_file = "codigot"
         elif req.type=="bool":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
-            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigob.txt","r").read().replace("+++++",req.text)
+            html_file = "input2"
+            code_file = "codigob"
         elif req.type=="list":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
-            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
-        time.sleep(1)
-        signalID = 0
-        signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
-        self.ALTabletService.executeJS(script)
-        while self.input=="":
-            time.sleep(1)
-        self.ALTabletService.hide()
+            html_file = "input3"
+            code_file = "codigol"
         try:
-            self.promise.future().hasValue(3000)
-        except RuntimeError:
-            raise RuntimeError('Timeout: no signal triggered')
-        self.ALTabletService.onJSEvent.disconnect(signalID)
-        print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
-        self.promise=qi.Promise()
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/"+html_file+".html")
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/"+code_file+".txt","r").read().replace("+++++",req.text)
+            time.sleep(1)
+            signalID = 0
+            signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+            self.ALTabletService.executeJS(script)
+            while self.input=="":
+                time.sleep(1)
+            self.ALTabletService.hide()
+            try:
+                self.promise.future().hasValue(3000)
+            except RuntimeError:
+                raise RuntimeError('Timeout: no signal triggered')
+            self.ALTabletService.onJSEvent.disconnect(signalID)
+            print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
+            self.promise=qi.Promise()
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/"+html_file+".html")
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/"+code_file+".txt","r").read().replace("+++++",req.text)
+            time.sleep(1)
+            signalID = 0
+            signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+            self.ALTabletService.executeJS(script)
+            while self.input=="":
+                time.sleep(1)
+            self.ALTabletService.hide()
+            try:
+                self.promise.future().hasValue(3000)
+            except RuntimeError:
+                raise RuntimeError('Timeout: no signal triggered')
+            self.ALTabletService.onJSEvent.disconnect(signalID)
+            print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
+            self.promise=qi.Promise()
         return self.input
 
     def callback_tablet_show_words_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_words_srv", "WARNING"))
         self.showing_words = True
-        self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
+        try:
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
         print(consoleFormatter.format('Showing words in tablet!', 'OKGREEN'))
         return "OK"
 
@@ -628,15 +680,23 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTabletService/show_picture_srv", "WARNING"))
         self.showing_words = False
         self.ALPhotoCapture.takePicture("/home/nao/.local/share/PackageManager/apps/robot-page/html/img/","picture",True)
-	rospy.sleep(2)
-        self.ALTabletService.showImageNoCache("http://198.18.0.1/apps/robot-page/img/picture.jpg")
+        rospy.sleep(2)
+        try:
+            self.ALTabletService.showImageNoCache("http://198.18.0.1/apps/robot-page/img/picture.jpg")
+        except:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showImageNoCache("http://198.18.0.1/apps/robot-page/img/picture.jpg")
         print(consoleFormatter.format('Showing picture taken in tablet!', 'OKGREEN'))
         return "OK"    
 
     def callback_tablet_play_video_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/play_video_srv", "WARNING"))
         self.showing_words = False
-        self.ALTabletService.playVideo(req.url)
+        try:
+            self.ALTabletService.playVideo(req.url)
+        except:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.playVideo(req.url)
         print(consoleFormatter.format('Video played!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
     
@@ -644,7 +704,11 @@ class PyToolkit:
     def callback_tablet_hide_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/hide_srv", "WARNING"))
         self.showing_words = False
-        self.ALTabletService.hide()
+        try:
+            self.ALTabletService.hide()
+        except:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.hide()
         print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
         return "OK"
 
