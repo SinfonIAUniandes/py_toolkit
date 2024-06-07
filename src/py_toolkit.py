@@ -90,7 +90,8 @@ class PyToolkit:
         self.ALBatteryService = session.service("ALBattery")
         self.ALAudioPlayer = session.service("ALAudioPlayer")
         self.ALTextToSpeech = session.service("ALTextToSpeech")
-
+	self.ALSpeakingMovement = session.service("ALSpeakingMovement")
+	self.ALAutonomousBlinking = session.service("ALAutonomousBlinking")
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -814,6 +815,8 @@ if __name__ == '__main__':
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1.5)
         pytoolkit.ALTabletService.hide()
+	pytoolkit.ALSpeakingMovement.setEnabled(True)
+	pytoolkit.ALAutonomousBlinking.setEnabled(True)
         time.sleep(1)
         pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
