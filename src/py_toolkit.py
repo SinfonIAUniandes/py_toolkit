@@ -844,9 +844,10 @@ class PyToolkit:
             nuevo_string = msg.text
             if "pau=" in nuevo_string:
                 index_pau = nuevo_string.find("pau=")
-                if index_pau > 0:  # Verifica si "pau=" no está al principio
-                    nuevo_string = nuevo_string[:index_pau-2] + nuevo_string[index_pau+len("pau="):]
-                else:  # "pau=" está al principio
+                if index_pau > 0:
+                    index_backslash = nuevo_string.find("\\", index_pau)
+                    nuevo_string = nuevo_string[:index_pau-2] + nuevo_string[index_backslash+1:]
+                else:
                     nuevo_string = nuevo_string[index_pau:]
                     nuevo_string = nuevo_string.replace("\\","")
                     nuevo_string = nuevo_string[:nuevo_string.find("\\")]
