@@ -133,15 +133,14 @@ class PyToolkit:
         self.awarenessSetAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/set_awareness_srv', SetBool, self.callback_awareness_set_awareness_srv)
         print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
         self.awarenessPauseAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/pause_awareness_srv', battery_service_srv, self.callback_awareness_pause_awareness_srv)
-        print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
+        print(consoleFormatter.format('pause_awareness_srv on!', 'OKGREEN'))
         self.awarenessResumeAwarenessServer = rospy.Service('pytoolkit/ALBasicAwareness/resume_awareness_srv', battery_service_srv, self.callback_awareness_resume_awareness_srv)
-        print(consoleFormatter.format('Set_awareness_srv on!', 'OKGREEN'))
+        print(consoleFormatter.format('resume_awareness_srv on!', 'OKGREEN'))
 
 
         
         # Service ROS Servers - ALMotion
          
-        
         self.motionSetSecurityArmsServer= rospy.Service('pytoolkit/ALMotion/set_arms_security_srv', SetBool, self.callback_set_arms_security_srv)
         print(consoleFormatter.format('ALMotion/set_arms_security_srv on!', 'OKGREEN'))
         
@@ -418,6 +417,7 @@ class PyToolkit:
     def callback_set_arms_security_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/set_arms_security_srv", "WARNING"))
         self.ALMotion.setCollisionProtectionEnabled("Arms", req.data)
+        self.ALMotion.setExternalCollisionProtectionEnabled("Arms", req.data)
         return SetBoolResponse(True, "OK")
 
     def callback_motion_set_tangential_security_distance_srv(self, req):
