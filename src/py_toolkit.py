@@ -854,9 +854,9 @@ class PyToolkit:
                         break
             script = script.replace("+++",str(nuevo_string+" "))
             if lenguaje=="Spanish":
-                script = script.replace("speed",450)
+                script = script.replace("speed","450")
             elif lenguaje=="English":
-                script = script.replace("speed",300)
+                script = script.replace("speed","300")
             self.ALTabletService.executeJS(script)
 
 if __name__ == '__main__':
