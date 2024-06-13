@@ -32,7 +32,7 @@ class PyToolkit:
         self.ALTextToSpeechStatusPublisher = rospy.Publisher('/pytoolkit/ALTextToSpeech/status', text_to_speech_status_msg, queue_size=10)
         print(consoleFormatter.format("ALTextToSpeech/status topic is up!","OKGREEN"))
         
-        self.ALMotionFailedPublisher = rospy.Publisher('/pytoolkit/ALMotion/failed', text_to_speech_status_msg, queue_size=10)
+        self.ALMotionFailedPublisher = rospy.Publisher('/pytoolkit/ALMotion/failed', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALMotion/failed topic is up!","OKGREEN"))
 
         self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
