@@ -842,12 +842,12 @@ class PyToolkit:
 		displayWords(1);
             """
             nuevo_string = msg.text
-            if "\\pau=" in nuevo_string:
-                index_start = nuevo_string.find("\\pau=")
-                index_end = nuevo_string.find("\\", index_start + 1)
-                if index_end != -1:
-                    nuevo_string = nuevo_string[:index_start] + nuevo_string[index_end + 1:]
-            if "rspd" in msg.text:
+            if "pau=" in nuevo_string:
+                for i, caracter in enumerate(msg.text.replace("\\","").replace("pau=","")):
+                    if not caracter.isdigit():
+                        nuevo_string = msg.text.replace("\\","").replace("pau=","")[i:]
+                        break
+            if "rspd" in nuevo_string:
                 for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
                     if not caracter.isdigit():
                         nuevo_string = msg.text.replace("\\","").replace("rspd=","")[i:]
