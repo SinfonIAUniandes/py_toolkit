@@ -844,9 +844,12 @@ class PyToolkit:
             nuevo_string = msg.text
             if "pau=" in nuevo_string:
                 index_pau = nuevo_string.find("pau=")
-                nuevo_string = nuevo_string[index_pau:]
-                nuevo_string = nuevo_string.replace("\\","")
-                nuevo_string = nuevo_string[:nuevo_string.find("\\")]
+                if index_pau > 0:  # Verifica si "pau=" no está al principio
+                    nuevo_string = nuevo_string[:index_pau-2] + nuevo_string[index_pau+len("pau="):]
+                else:  # "pau=" está al principio
+                    nuevo_string = nuevo_string[index_pau:]
+                    nuevo_string = nuevo_string.replace("\\","")
+                    nuevo_string = nuevo_string[:nuevo_string.find("\\")]
             if "rspd" in nuevo_string:
                 for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
                     if not caracter.isdigit():
