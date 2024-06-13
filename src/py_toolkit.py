@@ -126,7 +126,7 @@ class PyToolkit:
 
         # Service ROS Servers - ALAutonomousLife
         self.autonomousSetStateServer = rospy.Service('pytoolkit/ALAutonomousLife/set_state_srv', SetBool, self.callback_autonomous_set_state_srv)
-        print(consoleFormatter.format('ALAutonomousLife/set_state_srv on!', 'OKGREEN'))    
+        print(consoleFormatter.format('ALAutonomousLife/set_state_srv on!', 'OKGREEN'))   
 
 
         # Service ROS Servers - ALBasicAwareness
@@ -140,6 +140,11 @@ class PyToolkit:
 
         
         # Service ROS Servers - ALMotion
+         
+        
+        self.motionSetSecurityArmsServer= rospy.Service('pytoolkit/ALMotion/set_arms_security_srv', SetBool, self.callback_set_arms_security_srv)
+        print(consoleFormatter.format('ALMotion/set_arms_security_srv on!', 'OKGREEN'))
+        
         self.motionSetSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_security_distance_srv', set_security_distance_srv, self.callback_motion_set_security_distance_srv)    
         print(consoleFormatter.format('Set_security_distance_srv on!', 'OKGREEN'))
 
@@ -409,6 +414,11 @@ class PyToolkit:
         self.ALMotion.setExternalCollisionProtectionEnabled("All", False)
         print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
         return set_security_distance_srvResponse("OK")
+    
+    def callback_set_arms_security_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_arms_security_srv", "WARNING"))
+        self.ALMotion.setCollisionProtectionEnabled("Arms", req.data)
+        return SetBoolResponse(True, "OK")
 
     def callback_motion_set_tangential_security_distance_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/set_tangential_security_distance_srv", "WARNING"))
