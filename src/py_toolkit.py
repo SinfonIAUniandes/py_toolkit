@@ -851,6 +851,10 @@ class PyToolkit:
                     nuevo_string = nuevo_string[index_pau:]
                     nuevo_string = nuevo_string.replace("\\","")
                     nuevo_string = nuevo_string[:nuevo_string.find("\\")]
+                if "\\rspd=" in nuevo_string:
+                    index_rspd = nuevo_string.find("\\rspd=")
+                    index_backslash = nuevo_string.find("\\", index_rspd + 1)
+                    nuevo_string = nuevo_string[:index_rspd] + nuevo_string[index_backslash + 1:]
             if "rspd" in nuevo_string:
                 for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
                     if not caracter.isdigit():
