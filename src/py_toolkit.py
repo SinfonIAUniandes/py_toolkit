@@ -179,6 +179,8 @@ class PyToolkit:
         print(consoleFormatter.format('play_dance_srv on!', 'OKGREEN'))
 
         # Service ROS Servers - ALNavigation
+        self.navigationNavigateToServer = rospy.Service('pytoolkit/ALMotion/move_relative_srv', navigate_to_srv, self.callback_move_relative_srv)
+        print(consoleFormatter.format('move_relative_srv on!', 'OKGREEN'))
         self.navigationNavigateToServer = rospy.Service('pytoolkit/ALNavigation/navigate_to_srv', navigate_to_srv, self.callback_navigation_navigate_to_srv)
         print(consoleFormatter.format('Navigate_to_srv on!', 'OKGREEN'))
         self.navigationStartExploringServer = rospy.Service('pytoolkit/ALNavigation/start_exploring_srv', set_output_volume_srv, self.callback_start_exploring_srv)
@@ -492,9 +494,15 @@ class PyToolkit:
 
     # ----------------------------------------------------ALNavigation-------------------------------------------------
 
+    def callback_move_relative_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/move_relative_srv", "WARNING"))
+        self.ALMotion.moveTo(req.x_coordinate, req.y_coordinate, 0)
+        print(consoleFormatter.format('Robot is moving to the given coordinates!', 'OKGREEN'))
+        return navigate_to_srvResponse("OK")
+
     def callback_navigation_navigate_to_srv(self, req):
         print(consoleFormatter.format("\nRequested ALNavigation/navigate_to_srv", "WARNING"))
-        self.ALMotion.moveTo(req.x_coordinate, req.y_coordinate, 0)
+        self.ALNavigation.navigateTo(req.x_coordinate, req.y_coordinate)
         print(consoleFormatter.format('Robot is navigating to the given coordinates!', 'OKGREEN'))
         return navigate_to_srvResponse("OK")
     
