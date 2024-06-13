@@ -31,6 +31,9 @@ class PyToolkit:
         # Publishers
         self.ALTextToSpeechStatusPublisher = rospy.Publisher('/pytoolkit/ALTextToSpeech/status', text_to_speech_status_msg, queue_size=10)
         print(consoleFormatter.format("ALTextToSpeech/status topic is up!","OKGREEN"))
+        
+        self.ALMotionFailedPublisher = rospy.Publisher('/pytoolkit/ALMotion/failed', text_to_speech_status_msg, queue_size=10)
+        print(consoleFormatter.format("ALMotion/failed topic is up!","OKGREEN"))
 
         self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
@@ -58,6 +61,9 @@ class PyToolkit:
         
         self.ALSpeechDetectedSubscriber = self.ALMemory.subscriber("SpeechDetected")
         self.ALSpeechDetectedSubscriber.signal.connect(self.on_speech_recognition_detected)
+        
+        self.ALMotionFailedSubscriber = self.ALMemory.subscriber("ALMotion/MoveFailed")
+        self.ALMotionFailedSubscriber.signal.connect(self.on_move_failed)
 
         # Perception Subscriber
         self.ALPeoplePerceptionSubscriber = self.ALMemory.subscriber("PeoplePerception/JustArrived")
@@ -90,8 +96,8 @@ class PyToolkit:
         self.ALBatteryService = session.service("ALBattery")
         self.ALAudioPlayer = session.service("ALAudioPlayer")
         self.ALTextToSpeech = session.service("ALTextToSpeech")
-	self.ALSpeakingMovement = session.service("ALSpeakingMovement")
-	self.ALAutonomousBlinking = session.service("ALAutonomousBlinking")
+        self.ALSpeakingMovement = session.service("ALSpeakingMovement")
+        self.ALAutonomousBlinking = session.service("ALAutonomousBlinking")
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -329,7 +335,7 @@ class PyToolkit:
             dance_hands.dance(self.ALMotion)
         elif req.volume==3:
             dance_asereje.dance(self.ALMotion,self.ALAudioPlayer)
-	self.ALAudioPlayer.stopAll()
+        self.ALAudioPlayer.stopAll()
         return str("OK") 
 
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
@@ -455,8 +461,8 @@ class PyToolkit:
     def callback_motion_set_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
         self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
-	print(consoleFormatter.format('Angles set!', 'OKGREEN'))
-	return set_angle_srvResponse("OK")
+        print(consoleFormatter.format('Angles set!', 'OKGREEN'))
+        return set_angle_srvResponse("OK")
 
     def callback_motion_set_move_arms_enabled_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/set_move_arms_enabled_srv", "WARNING"))
@@ -768,6 +774,9 @@ class PyToolkit:
         idOfConcernedTask, status = value
         self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(idOfConcernedTask, status))
 
+    def on_move_failed(self, value):
+        self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(value[0]))
+
     def on_speech_recognition_status(self, value):
         word = value[0]
         number = value[1]
@@ -805,6 +814,7 @@ class PyToolkit:
             self.ALMotion.move(msg.linear.x, msg.linear.y, msg.angular.z)
         
     def on_words(self, msg):
+        lenguaje = msg.language
         if self.showing_words:
             script ="""
 		palabras = "+++".replace(/^\d+/, '');
@@ -825,24 +835,29 @@ class PyToolkit:
             contador++;
 			setTimeout(function() {
 			    displayWords(index + 1);
-			}, 450); 
+			}, "speed"); 
 		    }
 		}
 
 		displayWords(1);
             """
-	    nuevo_string = msg.text
+            nuevo_string = msg.text
+            if "\\pau=" in nuevo_string:
+                index_start = nuevo_string.find("\\pau=")
+                index_end = nuevo_string.find("\\", index_start + 1)
+                if index_end != -1:
+                    nuevo_string = nuevo_string[:index_start] + nuevo_string[index_end + 1:]
             if "rspd" in msg.text:
                 for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
                     if not caracter.isdigit():
                         nuevo_string = msg.text.replace("\\","").replace("rspd=","")[i:]
                         break
             script = script.replace("+++",str(nuevo_string+" "))
+            if lenguaje=="Spanish":
+                script = script.replace("speed",450)
+            elif lenguaje=="English":
+                script = script.replace("speed",300)
             self.ALTabletService.executeJS(script)
-            
-        
-        
-
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
@@ -881,8 +896,8 @@ if __name__ == '__main__':
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1.5)
         pytoolkit.ALTabletService.hide()
-	pytoolkit.ALSpeakingMovement.setEnabled(True)
-	pytoolkit.ALAutonomousBlinking.setEnabled(True)
+        pytoolkit.ALSpeakingMovement.setEnabled(True)
+        pytoolkit.ALAutonomousBlinking.setEnabled(True)
         time.sleep(1)
         pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
