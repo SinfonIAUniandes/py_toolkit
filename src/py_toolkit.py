@@ -775,7 +775,7 @@ class PyToolkit:
         self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(idOfConcernedTask, status))
 
     def on_move_failed(self, value):
-        self.ALTextToSpeechStatusPublisher.publish(text_to_speech_status_msg(value[0]))
+        self.ALMotionFailedPublisher.publish(speech_recognition_status_msg(value[0]))
 
     def on_speech_recognition_status(self, value):
         word = value[0]
