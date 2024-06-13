@@ -6,10 +6,13 @@ import time
 import rospy
 import rospkg
 import math
+import dance_arcadia
+import dance_hands
+import dance_asereje
 import argparse
 import sys
 from robot_toolkit_msgs.srv import set_words_threshold_srv, Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
-from robot_toolkit_msgs.msg import text_to_speech_status_msg, speech_recognition_status_msg 
+from robot_toolkit_msgs.msg import text_to_speech_status_msg,speech_recognition_status_msg, speech_msg
 from std_srvs.srv import SetBool, SetBoolResponse 
 from geometry_msgs.msg import Twist
 import ConsoleFormatter
@@ -32,12 +35,18 @@ class PyToolkit:
         self.ALSpeechRecognitionStatusPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/status', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSpeechRecognition/status topic is up!","OKGREEN"))
 
+        self.ALSpeechRecognitionDetectedPublisher = rospy.Publisher('/pytoolkit/ALSpeechRecognition/SpeechDetected', speech_recognition_status_msg, queue_size=10)
+        print(consoleFormatter.format("ALSpeechRecognition/SpeechDetected topic is up!","OKGREEN"))
+
         self.ALSensorsPublisher = rospy.Publisher('/pytoolkit/ALSensors/obstacles', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSensors/obstacles topic is up!","OKGREEN"))
 
         # Subscriber
         self.ALMotionMovePublisher = rospy.Subscriber('/pytoolkit/ALMotion/move', Twist, self.on_move)
         print(consoleFormatter.format("ALMotion/move subscriber is up!","OKGREEN"))
+
+        self.speechSubscriber=rospy.Subscriber("/speech", speech_msg, self.on_words)
+        print(consoleFormatter.format("/speech subscriber is up!","OKGREEN"))
 
         self.ALMemory = session.service("ALMemory")
         
@@ -46,6 +55,9 @@ class PyToolkit:
         
         self.ALSpeechRecognitionSubscriber = self.ALMemory.subscriber("WordRecognized")
         self.ALSpeechRecognitionSubscriber.signal.connect(self.on_speech_recognition_status)
+        
+        self.ALSpeechDetectedSubscriber = self.ALMemory.subscriber("SpeechDetected")
+        self.ALSpeechDetectedSubscriber.signal.connect(self.on_speech_recognition_detected)
 
         # Perception Subscriber
         self.ALPeoplePerceptionSubscriber = self.ALMemory.subscriber("PeoplePerception/JustArrived")
@@ -72,17 +84,23 @@ class PyToolkit:
         self.ALSegmentation3D.subscribe("pytoolkit")
         self.ALSpeechRecognitionService = session.service("ALSpeechRecognition")
         self.ALPeoplePerception = session.service("ALPeoplePerception")
+        self.ALPhotoCapture = session.service("ALPhotoCapture")
         self.ALTabletService = session.service("ALTabletService")
         self.ALTrackerService = session.service("ALTracker")
         self.ALBatteryService = session.service("ALBattery")
         self.ALAudioPlayer = session.service("ALAudioPlayer")
-
+        self.ALTextToSpeech = session.service("ALTextToSpeech")
+	self.ALSpeakingMovement = session.service("ALSpeakingMovement")
+	self.ALAutonomousBlinking = session.service("ALAutonomousBlinking")
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
         print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
         self.audioDeviceGetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/get_output_volume_srv', battery_service_srv, self.callback_audio_device_get_output_volume_srv)
         print(consoleFormatter.format('ALAudioDevice/get_output_volume_srv on!', 'OKGREEN'))
+
+        self.shutUpServer = rospy.Service('pytoolkit/ALTextToSpeech/shut_up_srv', battery_service_srv, self.callback_shut_up_srv)
+        print(consoleFormatter.format('ALTextToSpeech/shut_up_srv on!', 'OKGREEN'))
 
         self.audioHearingServer = rospy.Service('pytoolkit/ALSpeechRecognition/set_speechrecognition_srv', set_speechrecognition_srv, self.callback_set_speechrecognition_srv)
         print(consoleFormatter.format('ALAudioDevice/set_output_volume_srv on!', 'OKGREEN'))
@@ -119,6 +137,12 @@ class PyToolkit:
         self.motionSetSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_security_distance_srv', set_security_distance_srv, self.callback_motion_set_security_distance_srv)    
         print(consoleFormatter.format('Set_security_distance_srv on!', 'OKGREEN'))
 
+        self.motionSetTangentialSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_tangential_security_distance_srv', set_security_distance_srv, self.callback_motion_set_tangential_security_distance_srv)    
+        print(consoleFormatter.format('set_tangential_security_distance_srv on!', 'OKGREEN'))
+
+        self.motionSetOrthogonalSecurityDistanceServer = rospy.Service('pytoolkit/ALMotion/set_orthogonal_security_distance_srv', set_security_distance_srv, self.callback_motion_set_orthogonal_security_distance_srv)    
+        print(consoleFormatter.format('set_orthogonal_security_distance_srv on!', 'OKGREEN'))
+
         self.motionSetOpenCloseHandServer = rospy.Service('pytoolkit/ALMotion/set_open_close_hand_srv', set_open_close_hand_srv, self.callback_motion_set_open_close_hand_srv)
         print(consoleFormatter.format('Set_open_close_hand_srv on!', 'OKGREEN'))
 
@@ -131,7 +155,7 @@ class PyToolkit:
         print(consoleFormatter.format('Move_head_srv on!', 'OKGREEN'))
 
         self.motionSetAngleServer = rospy.Service('pytoolkit/ALMotion/set_angle_srv', set_angle_srv, self.callback_motion_set_angle_srv)
-        print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))  
+        print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))
 
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
         print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
@@ -145,9 +169,16 @@ class PyToolkit:
         self.stopAudioServer = rospy.Service('pytoolkit/ALAudioPlayer/stop_audio_stream_srv', battery_service_srv, self.callback_stop_audio_stream_srv)
         print(consoleFormatter.format('stop_audio_stream_srv on!', 'OKGREEN'))
 
+        self.playDanceServer = rospy.Service('pytoolkit/ALMotion/play_dance_srv', set_output_volume_srv, self.callback_play_dance_srv)
+        print(consoleFormatter.format('play_dance_srv on!', 'OKGREEN'))
+
         # Service ROS Servers - ALNavigation
         self.navigationNavigateToServer = rospy.Service('pytoolkit/ALNavigation/navigate_to_srv', navigate_to_srv, self.callback_navigation_navigate_to_srv)
         print(consoleFormatter.format('Navigate_to_srv on!', 'OKGREEN'))
+        self.navigationStartExploringServer = rospy.Service('pytoolkit/ALNavigation/start_exploring_srv', set_output_volume_srv, self.callback_start_exploring_srv)
+        print(consoleFormatter.format('start_exploring_srv on!', 'OKGREEN'))
+        self.navigationStopExploringServer = rospy.Service('pytoolkit/ALNavigation/stop_exploring_srv', battery_service_srv, self.callback_stop_exploring_srv)
+        print(consoleFormatter.format('stop_exploring_srv on!', 'OKGREEN'))
 
         
         # Service ROS Servers - ALRobotPosture
@@ -176,6 +207,12 @@ class PyToolkit:
 
         self.tabletGetInputServer = rospy.Service('pytoolkit/ALTabletService/get_input_srv', get_input_srv, self.callback_tablet_get_input_srv)
         print(consoleFormatter.format('Get_input_srv on!', 'OKGREEN'))  
+
+        self.tabletShowWordsServer = rospy.Service('pytoolkit/ALTabletService/show_words_srv', battery_service_srv, self.callback_tablet_show_words_srv)
+        print(consoleFormatter.format('Show_words_srv on!', 'OKGREEN'))  
+
+        self.tabletShowPicturesServer = rospy.Service('pytoolkit/ALTabletService/show_picture_srv', battery_service_srv, self.callback_tablet_show_picture_srv)
+        print(consoleFormatter.format('Show_picture_srv on!', 'OKGREEN'))  
 
         self.tabletHideServer = rospy.Service('pytoolkit/ALTabletService/hide_srv', battery_service_srv, self.callback_tablet_hide_srv)
         print(consoleFormatter.format('Hide_srv on!', 'OKGREEN'))    
@@ -207,8 +244,10 @@ class PyToolkit:
         self.threshold = []
         self.words = []
 
-        # Service ROS Servers - ALPerception
-        
+        # Variable for show_words service
+        self.showing_words = False
+
+        # Service ROS Servers - ALPerception        
         #self.Server = rospy.Service('pytoolkit/ALPerception/Tshirt_color_srv', Tshirt_color_srv, self.callback_Tshirt_color__srv)
         #print(consoleFormatter.format('Tshirt_color__srv!', 'OKGREEN')) 
 
@@ -231,6 +270,11 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALAudioDevice/get_output_volume_srv", "WARNING"))
         self.ALAudioDevice.getOutputVolume()
         return str(self.ALAudioDevice.getOutputVolume())
+
+    def callback_shut_up_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTextToSpeech/shut_up_srv", "WARNING"))
+        self.ALTextToSpeech.stopAll()
+        return str("OK")
 
     # ----------------------------------------------------ALAudioDevice------------------------------------------------------
     
@@ -269,12 +313,23 @@ class PyToolkit:
         self.ALAudioPlayer.playWebStream(req.names, req.stiffnesses,0)
         print(consoleFormatter.format('Stream played!', 'OKGREEN'))
         return set_stiffnesses_srvResponse("OK") 
-    
 
     def callback_stop_audio_stream_srv(self, req):
         print(consoleFormatter.format("\nRequested ALAudioPlayer/stop_audio_stream_srv", "WARNING"))
         self.ALAudioPlayer.stopAll()
         print(consoleFormatter.format('Stream stopped!', 'OKGREEN'))
+        return str("OK") 
+
+    def callback_play_dance_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/play_dance_srv", "WARNING"))
+        self.ALRobotPosture.goToPosture("Stand", 0.5)
+        if req.volume==1:
+            dance_arcadia.dance(self.ALMotion,self.ALAudioPlayer)
+        elif req.volume==2:
+            dance_hands.dance(self.ALMotion)
+        elif req.volume==3:
+            dance_asereje.dance(self.ALMotion,self.ALAudioPlayer)
+	self.ALAudioPlayer.stopAll()
         return str("OK") 
 
     # ----------------------------------------------------ALAutonomousLife------------------------------------------------
@@ -346,6 +401,16 @@ class PyToolkit:
         self.ALMotion.setExternalCollisionProtectionEnabled("All", False)
         print(consoleFormatter.format('Security distance was set to '+str(req.distance)+' m', 'OKGREEN'))
         return set_security_distance_srvResponse("OK")
+
+    def callback_motion_set_tangential_security_distance_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_tangential_security_distance_srv", "WARNING"))
+        self.ALMotion.setTangentialSecurityDistance(req.distance)
+        return set_security_distance_srvResponse("OK")
+
+    def callback_motion_set_orthogonal_security_distance_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/set_orthogonal_security_distance_srv", "WARNING"))
+        self.ALMotion.setOrthogonalSecurityDistance(req.distance)
+        return set_security_distance_srvResponse("OK")
     
     def callback_motion_enable_security_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/enable_security_srv", "WARNING"))
@@ -390,9 +455,9 @@ class PyToolkit:
     def callback_motion_set_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
         self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
-        print(consoleFormatter.format('Angles set!', 'OKGREEN'))
-        return set_angle_srvResponse("OK")
-    
+	print(consoleFormatter.format('Angles set!', 'OKGREEN'))
+	return set_angle_srvResponse("OK")
+
     def callback_motion_set_move_arms_enabled_srv(self, req):
         print(consoleFormatter.format("\nRequested ALMotion/set_move_arms_enabled_srv", "WARNING"))
         self.ALMotion.setMoveArmsEnabled(req.LArm, req.RArm)
@@ -427,7 +492,20 @@ class PyToolkit:
         print(consoleFormatter.format('Robot is navigating to the given coordinates!', 'OKGREEN'))
         return navigate_to_srvResponse("OK")
     
+    def callback_start_exploring_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALNavigation/start_exploring_srv", "WARNING"))
+        try:
+            print(consoleFormatter.format('Robot is exploring the surrounding '+str(req.volume)+' meters', 'OKGREEN'))
+            self.ALNavigation.explore(req.volume)
+        except RuntimeError:
+            print(consoleFormatter.format('Robot ended exploring the surrounding '+str(req.volume)+' meters', 'OKGREEN'))
+        return set_output_volume_srvResponse("OK")
 
+    def callback_stop_exploring_srv(self,req):
+        print(consoleFormatter.format("\nRequested ALNavigation/stop_exploring_srv", "WARNING"))
+        self.ALNavigation.stopExploration()
+        print(consoleFormatter.format('Robot has stopped exploring the surrounding meters', 'OKGREEN'))
+        return str("OK")
     
     # ----------------------------------------------------ALRobotPosture------------------------------------------------
     
@@ -468,7 +546,12 @@ class PyToolkit:
 
     def callback_tablet_show_image_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
-        self.ALTabletService.showImage(req.url)
+        self.showing_words = False
+        try:
+            self.ALTabletService.showImage(req.url)
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showImage(req.url)
         time.sleep(1)
         print(consoleFormatter.format('Image shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
@@ -476,27 +559,50 @@ class PyToolkit:
 
     def callback_tablet_show_web_view_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
-        self.ALTabletService.showWebview(req.url)
+        self.showing_words = False
+        try:
+            self.ALTabletService.showWebview(req.url)
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview(req.url)
         print(consoleFormatter.format('Web view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
     def callback_tablet_topic_srv(self, req):
+        self.showing_words = False
         ip=open(self.PYTOOLKIT_FOLDER+"/resources/topic_srv.txt","r").read()
-        print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
-        self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
-        time.sleep(3)
-        script = """
-        var body = document.querySelector("body");
-        body.style.margin = "0";
-        body.style.backgroundColor = "#161616";
-        body.style.display = "flex";
-        body.style.justifyContent = "center";
-        var img = document.querySelector("img");
-        img.style.height = "614px";
-        var heading = document.querySelector("h1");
-        heading.innerHTML = "";
-        """
-        self.ALTabletService.executeJS(script)
+        print(consoleFormatter.format("\nRequested ALTabletService/show_topic_srv", "WARNING"))
+        try:
+            self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
+            time.sleep(3)
+            script = """
+            var body = document.querySelector("body");
+            body.style.margin = "0";
+            body.style.backgroundColor = "#161616";
+            body.style.display = "flex";
+            body.style.justifyContent = "center";
+            var img = document.querySelector("img");
+            img.style.height = "614px";
+            var heading = document.querySelector("h1");
+            heading.innerHTML = "";
+            """
+            self.ALTabletService.executeJS(script)
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview("http://"+ip+":8080/stream_viewer?topic="+req.url)
+            time.sleep(3)
+            script = """
+            var body = document.querySelector("body");
+            body.style.margin = "0";
+            body.style.backgroundColor = "#161616";
+            body.style.display = "flex";
+            body.style.justifyContent = "center";
+            var img = document.querySelector("img");
+            img.style.height = "614px";
+            var heading = document.querySelector("h1");
+            heading.innerHTML = "";
+            """
+            self.ALTabletService.executeJS(script)
         print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
 
@@ -506,52 +612,110 @@ class PyToolkit:
         self.promise.setValue(True)
 
     def callback_tablet_get_input_srv(self, req):
+        self.showing_words = False
         self.input=""
-        print(consoleFormatter.format("\nRequested ALTabletService/show_web_view_srv", "WARNING"))
+        print(consoleFormatter.format("\nRequested ALTabletService/show_get_input_srv", "WARNING"))
         #text es un textbox donde la persona ingresa informacion
         #bool son 2 botones de yes no
         #list es una lista de opciones de la que elige el usuario
+        html_file = ""
+        code_file = ""
         if req.type=="text":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input1.html")
-            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigot.txt","r").read().replace("+++++",req.text)
+            html_file = "input1"
+            code_file = "codigot"
         elif req.type=="bool":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input2.html")
-            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigob.txt","r").read().replace("+++++",req.text)
+            html_file = "input2"
+            code_file = "codigob"
         elif req.type=="list":
-            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/input3.html")
             #Si el req.text no esta separado por comas tira error
-            script=open(self.PYTOOLKIT_FOLDER+"/resources/codigol.txt","r").read().replace("+++++",req.text)
-        time.sleep(1)
-        signalID = 0
-        signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
-        self.ALTabletService.executeJS(script)
-        while self.input=="":
-            time.sleep(1)
-        self.ALTabletService.hide()
+            html_file = "input3"
+            code_file = "codigol"
         try:
-            self.promise.future().hasValue(3000)
-        except RuntimeError:
-            raise RuntimeError('Timeout: no signal triggered')
-        self.ALTabletService.onJSEvent.disconnect(signalID)
-        print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
-        self.promise=qi.Promise()
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/"+html_file+".html")
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/"+code_file+".txt","r").read().replace("+++++",req.text)
+            time.sleep(1)
+            signalID = 0
+            signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+            self.ALTabletService.executeJS(script)
+            while self.input=="":
+                time.sleep(1)
+            self.ALTabletService.hide()
+            try:
+                self.promise.future().hasValue(3000)
+            except RuntimeError:
+                raise RuntimeError('Timeout: no signal triggered')
+            self.ALTabletService.onJSEvent.disconnect(signalID)
+            print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
+            self.promise=qi.Promise()
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/"+html_file+".html")
+            script=open(self.PYTOOLKIT_FOLDER+"/resources/"+code_file+".txt","r").read().replace("+++++",req.text)
+            time.sleep(1)
+            signalID = 0
+            signalID = self.ALTabletService.onJSEvent.connect(self.getInput)
+            self.ALTabletService.executeJS(script)
+            while self.input=="":
+                time.sleep(1)
+            self.ALTabletService.hide()
+            try:
+                self.promise.future().hasValue(3000)
+            except RuntimeError:
+                raise RuntimeError('Timeout: no signal triggered')
+            self.ALTabletService.onJSEvent.disconnect(signalID)
+            print(consoleFormatter.format('Topic view shown!', 'OKGREEN'))
+            self.promise=qi.Promise()
         return self.input
-    
+
+    def callback_tablet_show_words_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTabletService/show_words_srv", "WARNING"))
+        self.showing_words = True
+        try:
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
+        except Exception as e:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showWebview("http://198.18.0.1/apps/robot-page/show_words.html")
+        print(consoleFormatter.format('Showing words in tablet!', 'OKGREEN'))
+        return "OK"
+
+    def callback_tablet_show_picture_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALTabletService/show_picture_srv", "WARNING"))
+        self.showing_words = False
+        self.ALPhotoCapture.takePicture("/home/nao/.local/share/PackageManager/apps/robot-page/html/img/","picture",True)
+        rospy.sleep(2)
+        try:
+            self.ALTabletService.showImageNoCache("http://198.18.0.1/apps/robot-page/img/picture.jpg")
+        except:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.showImageNoCache("http://198.18.0.1/apps/robot-page/img/picture.jpg")
+        print(consoleFormatter.format('Showing picture taken in tablet!', 'OKGREEN'))
+        return "OK"    
 
     def callback_tablet_play_video_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/play_video_srv", "WARNING"))
-        self.ALTabletService.playVideo(req.url)
+        self.showing_words = False
+        try:
+            self.ALTabletService.playVideo(req.url)
+        except:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.playVideo(req.url)
         print(consoleFormatter.format('Video played!', 'OKGREEN'))
         return tablet_service_srvResponse("OK")
     
 
     def callback_tablet_hide_srv(self, req):
         print(consoleFormatter.format("\nRequested ALTabletService/hide_srv", "WARNING"))
-        self.ALTabletService.hide()
+        self.showing_words = False
+        try:
+            self.ALTabletService.hide()
+        except:
+            self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.hide()
         print(consoleFormatter.format('Tablet hidden!', 'OKGREEN'))
         return "OK"
 
     def callback_tablet_overload_srv(self, req):
+        self.showing_words = False
         for i in range(10):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1.5)
@@ -614,6 +778,12 @@ class PyToolkit:
         except ValueError:
             print("word not in list")
 
+    def on_speech_recognition_detected(self, value):
+        if value==0:
+            self.ALSpeechRecognitionDetectedPublisher.publish(speech_recognition_status_msg("stopped"))
+        if value==1:
+            self.ALSpeechRecognitionDetectedPublisher.publish(speech_recognition_status_msg("started"))
+
     def on_Perception_Tshirt(self, id):
         self.id = id 
         
@@ -633,6 +803,42 @@ class PyToolkit:
             self.y = msg.linear.y
             self.theta = msg.angular.z
             self.ALMotion.move(msg.linear.x, msg.linear.y, msg.angular.z)
+        
+    def on_words(self, msg):
+        if self.showing_words:
+            script ="""
+		palabras = "+++".replace(/^\d+/, '');
+		outputDiv = document.getElementById('output');
+		outputDiv.innerText = "";
+		var words = palabras.split(" ");
+		textoConcatenado = words[0] + " ";
+        contador = 0;
+		function displayWords(index) {
+		    if (index < words.length) {
+            if (contador>=18){
+                textoConcatenado = ""; 
+                outputDiv.innerText = "";
+                contador = 0;
+            }
+			textoConcatenado = textoConcatenado.concat(" ",words[index]);
+			outputDiv.innerText = textoConcatenado;
+            contador++;
+			setTimeout(function() {
+			    displayWords(index + 1);
+			}, 450); 
+		    }
+		}
+
+		displayWords(1);
+            """
+	    nuevo_string = msg.text
+            if "rspd" in msg.text:
+                for i, caracter in enumerate(msg.text.replace("\\","").replace("rspd=","")):
+                    if not caracter.isdigit():
+                        nuevo_string = msg.text.replace("\\","").replace("rspd=","")[i:]
+                        break
+            script = script.replace("+++",str(nuevo_string+" "))
+            self.ALTabletService.executeJS(script)
             
         
         
@@ -658,6 +864,8 @@ if __name__ == '__main__':
     try:
         pytoolkit.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
         pytoolkit.ALAutonomousLife.setState("disabled")
+        # En teoria evita que el robot se le dañe el brazo
+        rospy.sleep(1)
         pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
         if pytoolkit.ALBasicAwareness.isEnabled():
             pytoolkit.ALBasicAwareness.setEnabled(False)
@@ -673,6 +881,8 @@ if __name__ == '__main__':
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1.5)
         pytoolkit.ALTabletService.hide()
+	pytoolkit.ALSpeakingMovement.setEnabled(True)
+	pytoolkit.ALAutonomousBlinking.setEnabled(True)
         time.sleep(1)
         pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
