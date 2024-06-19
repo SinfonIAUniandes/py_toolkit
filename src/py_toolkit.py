@@ -127,6 +127,8 @@ class PyToolkit:
         # Service ROS Servers - ALAutonomousLife
         self.autonomousSetStateServer = rospy.Service('pytoolkit/ALAutonomousLife/set_state_srv', SetBool, self.callback_autonomous_set_state_srv)
         print(consoleFormatter.format('ALAutonomousLife/set_state_srv on!', 'OKGREEN'))   
+        self.toggleBlinkngServer = rospy.Service('pytoolkit/ALAutonomousBlinking/toggle_blinking_srv', SetBool, self.callback_toggle_blinking_srv)
+        print(consoleFormatter.format('ALAutonomousBlinking/toggle_blinking_srv on!', 'OKGREEN'))   
 
 
         # Service ROS Servers - ALBasicAwareness
@@ -380,6 +382,11 @@ class PyToolkit:
         self.ALBasicAwareness.pauseAwareness()
         self.ALBasicAwareness.stopAwareness()
         print(consoleFormatter.format('Awareness is paused!', 'OKGREEN'))
+        return "OK"
+
+    def callback_toggle_blinking_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALAutonomousBlinking/toggle_blinking_srv", "WARNING"))
+        self.ALAutonomousBlinking.setEnabled(req.data)
         return "OK"
 
     #Este es para reanudar el awarenes
