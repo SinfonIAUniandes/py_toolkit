@@ -387,7 +387,7 @@ class PyToolkit:
     def callback_toggle_blinking_srv(self, req):
         print(consoleFormatter.format("\nRequested ALAutonomousBlinking/toggle_blinking_srv", "WARNING"))
         self.ALAutonomousBlinking.setEnabled(req.data)
-        return "OK"
+        return SetBoolResponse(True, "OK")
 
     #Este es para reanudar el awarenes
     def callback_awareness_resume_awareness_srv(self, req):
