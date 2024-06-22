@@ -838,7 +838,12 @@ class PyToolkit:
             
     def get_angles_thread(self):
         while self.publish_angles!="None":
-            self.ALGetAnglesPublisher.publish(self.ALMotion.getAngles(self.publish_angles), False)
+            angle = self.ALMotion.getAngles(self.publish_angles, False)
+            msg = set_angles_msg()
+            msg.names = self.publish_angles
+            msg.angles = angle
+            msg.fraction_max_speed = []
+            self.ALGetAnglesPublisher.publish(msg)
             rospy.sleep(0.1)
 
     def on_Perception_Tshirt(self, id):
