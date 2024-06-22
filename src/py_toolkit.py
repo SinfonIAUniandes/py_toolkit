@@ -3,6 +3,7 @@
 
 import qi
 import time
+import threading
 import rospy
 import rospkg
 import math
@@ -12,7 +13,7 @@ import dance_asereje
 import argparse
 import sys
 from robot_toolkit_msgs.srv import set_words_threshold_srv, Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
-from robot_toolkit_msgs.msg import text_to_speech_status_msg,speech_recognition_status_msg, speech_msg
+from robot_toolkit_msgs.msg import text_to_speech_status_msg,speech_recognition_status_msg, speech_msg, set_angles_msg
 from std_srvs.srv import SetBool, SetBoolResponse 
 from geometry_msgs.msg import Twist
 import ConsoleFormatter
@@ -43,6 +44,11 @@ class PyToolkit:
 
         self.ALSensorsPublisher = rospy.Publisher('/pytoolkit/ALSensors/obstacles', speech_recognition_status_msg, queue_size=10)
         print(consoleFormatter.format("ALSensors/obstacles topic is up!","OKGREEN"))
+        
+        self.ALGetAnglesPublisher = rospy.Publisher('/pytoolkit/ALMotion/get_angles', set_angles_msg, queue_size=10)
+        print(consoleFormatter.format("ALMotion/get_angles topic is up!","OKGREEN"))
+
+        self.publish_angles = "None"
 
         # Subscriber
         self.ALMotionMovePublisher = rospy.Subscriber('/pytoolkit/ALMotion/move', Twist, self.on_move)
@@ -168,6 +174,9 @@ class PyToolkit:
 
         self.motionSetAngleServer = rospy.Service('pytoolkit/ALMotion/set_angle_srv', set_angle_srv, self.callback_motion_set_angle_srv)
         print(consoleFormatter.format('set_angle_srv on!', 'OKGREEN'))
+
+        self.toggleGetAngleServer = rospy.Service('pytoolkit/ALMotion/toggle_get_angle_srv', set_angle_srv, self.callback_toggle_get_angle_srv)
+        print(consoleFormatter.format('toggle_get_angle_srv on!', 'OKGREEN'))
 
         self.motionSetMoveArmsEnabledServer = rospy.Service('pytoolkit/ALMotion/set_move_arms_enabled_srv', set_move_arms_enabled_srv, self.callback_motion_set_move_arms_enabled_srv)
         print(consoleFormatter.format('Set_move_arms_enabled_srv on!', 'OKGREEN'))
@@ -481,6 +490,14 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
         self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
         print(consoleFormatter.format('Angles set!', 'OKGREEN'))
+        return set_angle_srvResponse("OK")
+    
+    def callback_toggle_get_angle_srv(self,req):
+        print(consoleFormatter.format("\nRequested ALMotion/turn_get_angle_srv", "WARNING"))
+        self.publish_angles = req.name
+        publish_angles_thread = threading.Thread(self.get_angles_thread)
+        publish_angles_thread.start()
+        print(consoleFormatter.format('Started publisihing /pytoolkit/ALMotion/get_angles', 'OKGREEN'))
         return set_angle_srvResponse("OK")
 
     def callback_motion_set_move_arms_enabled_srv(self, req):
@@ -817,6 +834,11 @@ class PyToolkit:
             self.ALSpeechRecognitionDetectedPublisher.publish(speech_recognition_status_msg("stopped"))
         if value==1:
             self.ALSpeechRecognitionDetectedPublisher.publish(speech_recognition_status_msg("started"))
+            
+    def get_angles_thread(self):
+        while self.publish_angles!="None":
+            self.ALGetAnglesPublisher.publish(self.ALMotion.getAngles(self.publish_angles))
+            rospy.sleep(0.1)
 
     def on_Perception_Tshirt(self, id):
         self.id = id 
