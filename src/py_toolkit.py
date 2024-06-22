@@ -495,7 +495,7 @@ class PyToolkit:
     def callback_toggle_get_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/turn_get_angle_srv", "WARNING"))
         self.publish_angles = req.name
-        publish_angles_thread = threading.Thread(self.get_angles_thread)
+        publish_angles_thread = threading.Thread(target=self.get_angles_thread)
         publish_angles_thread.start()
         print(consoleFormatter.format('Started publisihing /pytoolkit/ALMotion/get_angles', 'OKGREEN'))
         return set_angle_srvResponse("OK")
