@@ -495,6 +495,7 @@ class PyToolkit:
     def callback_toggle_get_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/turn_get_angle_srv", "WARNING"))
         self.publish_angles = req.name
+        print(req)
         publish_angles_thread = threading.Thread(target=self.get_angles_thread)
         publish_angles_thread.start()
         print(consoleFormatter.format('Started publisihing /pytoolkit/ALMotion/get_angles', 'OKGREEN'))
@@ -837,7 +838,7 @@ class PyToolkit:
             
     def get_angles_thread(self):
         while self.publish_angles!="None":
-            self.ALGetAnglesPublisher.publish(self.ALMotion.getAngles(self.publish_angles))
+            self.ALGetAnglesPublisher.publish(self.ALMotion.getAngles(self.publish_angles), False)
             rospy.sleep(0.1)
 
     def on_Perception_Tshirt(self, id):
