@@ -597,9 +597,11 @@ class PyToolkit:
         print(consoleFormatter.format("\nRequested ALTabletService/show_image_srv", "WARNING"))
         self.showing_words = False
         try:
+            self.ALTabletService.hide()
             self.ALTabletService.showImage(req.url)
         except Exception as e:
             self.ALTabletService = session.service("ALTabletService")
+            self.ALTabletService.hide()
             self.ALTabletService.showImage(req.url)
         time.sleep(1)
         print(consoleFormatter.format('Image shown!', 'OKGREEN'))
