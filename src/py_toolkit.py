@@ -489,6 +489,7 @@ class PyToolkit:
     def callback_motion_set_angle_srv(self,req):
         print(consoleFormatter.format("\nRequested ALMotion/set_angle_srv", "WARNING"))
         self.ALMotion.setAngles(tuple(req.name), tuple(req.angle), req.speed)
+	print(str(req.name)+str(req.angle)+str(req.speed))
         print(consoleFormatter.format('Angles set!', 'OKGREEN'))
         return set_angle_srvResponse("OK")
     
