@@ -302,12 +302,13 @@ class PyToolkit:
     # ----------------------------------------------------ALAudioDevice------------------------------------------------------
     
     def callback_set_words_srv(self, req):
-        self.ALSpeechRecognitionService.pause(True)
-        self.ALSpeechRecognitionService.removeAllContext()
-        self.ALSpeechRecognitionService.setVocabulary(req.words,False)
-        self.words = req.words
-        self.threshold = req.threshold
-        self.ALSpeechRecognitionService.pause(False)
+        if len(req.words>0):
+            self.ALSpeechRecognitionService.pause(True)
+            self.ALSpeechRecognitionService.removeAllContext()
+            self.ALSpeechRecognitionService.setVocabulary(req.words,False)
+            self.words = req.words
+            self.threshold = req.threshold
+            self.ALSpeechRecognitionService.pause(False)
         return "OK"
     
     def callback_set_hot_word_language_srv(self,req):
