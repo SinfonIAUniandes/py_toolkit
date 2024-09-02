@@ -183,6 +183,9 @@ class PyToolkit:
 
         self.motionSetStiffnessesServer = rospy.Service('pytoolkit/ALMotion/set_stiffnesses_srv', set_stiffnesses_srv, self.callback_set_stiffnesses_srv)
         print(consoleFormatter.format('set_stiffnesses_srv on!', 'OKGREEN'))
+        
+        self.motionToggleSmartStiffnessServer = rospy.Service('pytoolkit/ALMotion/toggle_smart_stiffness_srv', SetBool, self.callback_toggle_smart_stiffness_srv)
+        print(consoleFormatter.format('toggle_smart_stiffness_srv on!', 'OKGREEN'))
 
         self.playAudioStreamServer = rospy.Service('pytoolkit/ALAudioPlayer/play_audio_stream_srv', set_stiffnesses_srv, self.callback_play_audio_stream_srv)
         print(consoleFormatter.format('play_audio_stream_srv on!', 'OKGREEN'))
@@ -529,6 +532,11 @@ class PyToolkit:
         self.ALMotion.setStiffnesses(req.names, req.stiffnesses)
         print(consoleFormatter.format('Stiffness set!', 'OKGREEN'))
         return set_stiffnesses_srvResponse("OK") 
+        
+    def callback_toggle_smart_stiffness_srv(self, req):
+        print(consoleFormatter.format("\nRequested ALMotion/toggle_smart_stiffness_srv", "WARNING"))
+        self.ALMotion.setSmartStiffnessEnabled(req.data)
+        return SetBoolResponse(True, "OK")
 
     # ----------------------------------------------------ALNavigation-------------------------------------------------
 
