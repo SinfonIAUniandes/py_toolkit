@@ -793,7 +793,10 @@ class PyToolkit:
     
     def callback_toggle_applauncher_srv(self,req):
         if req.data:
-            pytoolkit.ALServiceManager.start("AppLauncher")
+            try:
+                pytoolkit.ALServiceManager.start("AppLauncher")
+            except:
+                pass
         else:
             try:
                 pytoolkit.ALServiceManager.stop("AppLauncher")
