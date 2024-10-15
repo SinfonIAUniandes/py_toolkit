@@ -104,6 +104,7 @@ class PyToolkit:
         self.ALTextToSpeech = session.service("ALTextToSpeech")
         self.ALSpeakingMovement = session.service("ALSpeakingMovement")
         self.ALAutonomousBlinking = session.service("ALAutonomousBlinking")
+        self.ALServiceManager = session.service("ALServiceManager")
 
         # Service ROS Servers - ALAudioDevice
         self.audioDeviceSetOutputVolumeServer = rospy.Service('pytoolkit/ALAudioDevice/set_output_volume_srv', set_output_volume_srv, self.callback_audio_device_set_output_volume_srv)
@@ -133,7 +134,7 @@ class PyToolkit:
         # Service ROS Servers - ALAutonomousLife
         self.autonomousSetStateServer = rospy.Service('pytoolkit/ALAutonomousLife/set_state_srv', SetBool, self.callback_autonomous_set_state_srv)
         print(consoleFormatter.format('ALAutonomousLife/set_state_srv on!', 'OKGREEN'))   
-        self.toggleBlinkngServer = rospy.Service('pytoolkit/ALAutonomousBlinking/toggle_blinking_srv', SetBool, self.callback_toggle_blinking_srv)
+        self.toggleBlinkingServer = rospy.Service('pytoolkit/ALAutonomousBlinking/toggle_blinking_srv', SetBool, self.callback_toggle_blinking_srv)
         print(consoleFormatter.format('ALAutonomousBlinking/toggle_blinking_srv on!', 'OKGREEN'))   
 
 
@@ -247,7 +248,10 @@ class PyToolkit:
         print(consoleFormatter.format('enable_security_srv on!', 'OKGREEN'))    
 
         self.tabletOverloadServer = rospy.Service('pytoolkit/ALTabletService/overload_srv', battery_service_srv, self.callback_tablet_overload_srv)
-        print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))
+        print(consoleFormatter.format('Overload_srv on!', 'OKGREEN'))  
+
+        self.toggleAppLauncherServer = rospy.Service('pytoolkit/ALServiceManager/toggle_applauncher_srv', SetBool, self.callback_toggle_applauncher_srv)
+        print(consoleFormatter.format('toggle_applauncher_srv on!', 'OKGREEN'))
 
 
         # Service ROS Servers - ALTracker
@@ -779,12 +783,21 @@ class PyToolkit:
         return "OK"
 
     def callback_tablet_overload_srv(self, req):
+        print("overloading tablet...")
         self.showing_words = False
         for i in range(10):
             pytoolkit.ALTabletService.loadApplication("webdisplay")
             time.sleep(1.5)
         pytoolkit.ALTabletService.hide()
         return "OK"
+    
+    def callback_toggle_applauncher_srv(self,req):
+        if req.data:
+            pytoolkit.ALServiceManager.start("AppLauncher")
+        else:
+            pytoolkit.ALServiceManager.stop("AppLauncher")
+        return SetBoolResponse(True, "OK")
+        
     
     # ----------------------------------------------------ALTrackerService------------------------------------------------
 
@@ -951,27 +964,18 @@ if __name__ == '__main__':
     pytoolkit = PyToolkit(session)
     rospy.init_node('pytoolkit')
     try:
-        pytoolkit.ALAutonomousLife.setAutonomousAbilityEnabled("All", False)
-        pytoolkit.ALAutonomousLife.setState("disabled")
-        # En teoria evita que el robot se le dañe el brazo
-        rospy.sleep(1)
-        pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
-        if pytoolkit.ALBasicAwareness.isEnabled():
-            pytoolkit.ALBasicAwareness.setEnabled(False)
-        pytoolkit.ALBasicAwareness.startAwareness()
-        pytoolkit.ALBasicAwareness.resumeAwareness()
-        pytoolkit.ALBasicAwareness.pauseAwareness()
-        pytoolkit.ALBasicAwareness.stopAwareness()
+        pytoolkit.ALAutonomousBlinking.setEnabled(True)
+        if pytoolkit.ALAutonomousLife.getState()!="disabled":
+            pytoolkit.ALAutonomousLife.setState("disabled")
+            # En teoria evita que el robot se le dañe el brazo
+            rospy.sleep(2)
+            pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
+            print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         pytoolkit.ALTrackerService.setMaximumDistanceDetection(0.1)
         pytoolkit.ALTrackerService.stopTracker()
-        print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
-        print("overloading tablet...")
-        for i in range(10):
-            pytoolkit.ALTabletService.loadApplication("webdisplay")
-            time.sleep(1.5)
+        pytoolkit.ALServiceManager.stop("AppLauncher")
         pytoolkit.ALTabletService.hide()
         pytoolkit.ALSpeakingMovement.setEnabled(True)
-        pytoolkit.ALAutonomousBlinking.setEnabled(True)
         time.sleep(1)
         pytoolkit.ALTabletService.showImage("http://198.18.0.1/apps/robot-page/img/logo.png")
         print(consoleFormatter.format(" \n----------------------------------------------------------", "OKGREEN"))  
