@@ -794,6 +794,8 @@ class PyToolkit:
     def callback_toggle_applauncher_srv(self,req):
         if req.data:
             try:
+                if pytoolkit.ALAutonomousLife.getState()=="disabled":
+                    pytoolkit.ALAutonomousLife.setState("interactive")
                 pytoolkit.ALServiceManager.start("AppLauncher")
             except:
                 pass
