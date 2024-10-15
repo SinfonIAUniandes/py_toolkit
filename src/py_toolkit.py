@@ -795,7 +795,10 @@ class PyToolkit:
         if req.data:
             pytoolkit.ALServiceManager.start("AppLauncher")
         else:
-            pytoolkit.ALServiceManager.stop("AppLauncher")
+            try:
+                pytoolkit.ALServiceManager.stop("AppLauncher")
+            except:
+                pass
         return SetBoolResponse(True, "OK")
         
     
@@ -866,13 +869,16 @@ class PyToolkit:
             
     def get_angles_thread(self):
         while self.publish_angles!="None":
-            angle = self.ALMotion.getAngles(self.publish_angles, False)
-            msg = set_angles_msg()
-            msg.names = self.publish_angles
-            msg.angles = angle
-            msg.fraction_max_speed = []
-            self.ALGetAnglesPublisher.publish(msg)
-            rospy.sleep(0.1)
+            try:
+                angle = self.ALMotion.getAngles(self.publish_angles, False)
+                msg = set_angles_msg()
+                msg.names = self.publish_angles
+                msg.angles = angle
+                msg.fraction_max_speed = []
+                self.ALGetAnglesPublisher.publish(msg)
+                rospy.sleep(0.1)
+            except:
+                pass
 
     def on_Perception_Tshirt(self, id):
         self.id = id 
@@ -973,7 +979,10 @@ if __name__ == '__main__':
             print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
         pytoolkit.ALTrackerService.setMaximumDistanceDetection(0.1)
         pytoolkit.ALTrackerService.stopTracker()
-        pytoolkit.ALServiceManager.stop("AppLauncher")
+        try:
+            pytoolkit.ALServiceManager.stop("AppLauncher")
+        except:
+            pass
         pytoolkit.ALTabletService.hide()
         pytoolkit.ALSpeakingMovement.setEnabled(True)
         time.sleep(1)
