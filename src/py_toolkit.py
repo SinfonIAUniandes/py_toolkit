@@ -983,6 +983,8 @@ if __name__ == '__main__':
             pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
             print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
             pytoolkit.ALBasicAwareness.setEnabled(False)
+            pytoolkit.ALBasicAwareness.pauseAwareness()
+            pytoolkit.ALBasicAwareness.stopAwareness()
         pytoolkit.ALTrackerService.setMaximumDistanceDetection(0.1)
         pytoolkit.ALTrackerService.stopTracker()
         try:
