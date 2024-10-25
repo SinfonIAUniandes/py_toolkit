@@ -978,6 +978,7 @@ if __name__ == '__main__':
         pytoolkit.ALAutonomousBlinking.setEnabled(True)
         if pytoolkit.ALAutonomousLife.getState()!="disabled":
             pytoolkit.ALAutonomousLife.setState("disabled")
+            pytoolkit.ALBasicAwareness.setEnabled(False)
             # En teoria evita que el robot se le dañe el brazo
             rospy.sleep(2)
             pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
