@@ -7,6 +7,7 @@ import threading
 import rospy
 import rospkg
 import math
+import numpy as np
 import dance_arcadia
 import dance_hands
 import dance_asereje
@@ -315,7 +316,7 @@ class PyToolkit:
         with open("/tmp/say_to_file.raw", 'rb') as f:
             audio_bytes = f.read()
         response = say_to_file_srvResponse()
-        response.data = list(audio_bytes)
+        response.data = np.frombuffer(audio_bytes, dtype=np.uint8).tolist()
         return response
 
     # ----------------------------------------------------ALAudioDevice------------------------------------------------------
