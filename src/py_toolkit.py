@@ -12,9 +12,8 @@ import dance_hands
 import dance_asereje
 import argparse
 import sys
-from robot_toolkit_msgs.srv import say_to_file_srv,set_words_threshold_srv, Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
+from robot_toolkit_msgs.srv import say_to_file_srv, say_to_file_srvResponse,set_words_threshold_srv, Tshirt_color_srv, tablet_service_srv, go_to_posture_srv, go_to_posture_srvResponse, tablet_service_srvResponse, go_to_posture_srvRequest, set_output_volume_srv, set_output_volume_srvResponse, set_security_distance_srv, set_security_distance_srvResponse, get_input_srv, set_speechrecognition_srv, point_at_srv, point_at_srvResponse, set_open_close_hand_srv, set_open_close_hand_srvResponse, move_head_srv, move_head_srvRequest, move_head_srvResponse , set_angle_srv , set_angle_srvResponse, get_segmentation3D_srv, get_segmentation3D_srvResponse, set_move_arms_enabled_srv, set_move_arms_enabled_srvResponse, navigate_to_srv, navigate_to_srvResponse, set_stiffnesses_srv, set_stiffnesses_srvResponse, battery_service_srv, speech_recognition_srv
 from robot_toolkit_msgs.msg import text_to_speech_status_msg,speech_recognition_status_msg, speech_msg, set_angles_msg
-from audio_common_msgs.msg import AudioData, AudioDataResponse
 from std_srvs.srv import SetBool, SetBoolResponse 
 from geometry_msgs.msg import Twist
 import ConsoleFormatter
@@ -315,7 +314,7 @@ class PyToolkit:
         self.ALTextToSpeech.sayToFile(req.text, "/tmp/say_to_file.raw")
         with open("/tmp/say_to_file.raw", 'rb') as f:
             audio_bytes = f.read()
-        response = AudioDataResponse()
+        response = say_to_file_srvResponse()
         response.data = list(audio_bytes)
         return response
 
