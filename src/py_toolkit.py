@@ -994,9 +994,7 @@ if __name__ == '__main__':
             rospy.sleep(2)
             pytoolkit.ALRobotPosture.goToPosture("Stand", 0.5)
             print(consoleFormatter.format('Robot is in default position!', 'OKGREEN'))
-            rospy.sleep(1)
-            pytoolkit.ALBasicAwareness.setEnabled(False)
-            rospy.sleep(1)
+        if pytoolkit.ALBasicAwareness.isEnabled():
             pytoolkit.ALBasicAwareness.setEnabled(False)
         pytoolkit.ALTrackerService.setMaximumDistanceDetection(0.1)
         pytoolkit.ALTrackerService.stopTracker()
