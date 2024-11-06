@@ -988,6 +988,10 @@ if __name__ == '__main__':
     pytoolkit = PyToolkit(session)
     rospy.init_node('pytoolkit')
     try:
+        try:
+            pytoolkit.ALServiceManager.stop("AppLauncher")
+        except:
+            pass
         pytoolkit.ALAutonomousBlinking.setEnabled(True)
         if pytoolkit.ALAutonomousLife.getState()!="disabled":
             pytoolkit.ALAutonomousLife.setState("disabled")
@@ -999,10 +1003,6 @@ if __name__ == '__main__':
             pytoolkit.ALBasicAwareness.setEnabled(False)
         pytoolkit.ALTrackerService.setMaximumDistanceDetection(0.1)
         pytoolkit.ALTrackerService.stopTracker()
-        try:
-            pytoolkit.ALServiceManager.stop("AppLauncher")
-        except:
-            pass
         pytoolkit.ALTabletService.hide()
         pytoolkit.ALSpeakingMovement.setEnabled(True)
         time.sleep(1)
