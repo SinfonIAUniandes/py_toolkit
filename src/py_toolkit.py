@@ -137,7 +137,7 @@ class PyToolkit:
         self.ALTextToSpeechCurrentWordSubscriber = self.ALMemory.subscriber(
             "ALTextToSpeech/CurrentWord"
         )
-        self.ALTextToSpeechCurrentWordSubscriber.signal.connect(self.on_tts_status)
+        self.ALTextToSpeechCurrentWordSubscriber.signal.connect(self.on_tts_current_word)
 
         self.ALSpeechRecognitionSubscriber = self.ALMemory.subscriber("WordRecognized")
         self.ALSpeechRecognitionSubscriber.signal.connect(
@@ -1394,6 +1394,7 @@ class PyToolkit:
         )
 
     def on_tts_current_word(self, value):
+        print(value)
         idOfConcernedTask, word = value
         if len(self.current_words>18):
             self.current_words += value
