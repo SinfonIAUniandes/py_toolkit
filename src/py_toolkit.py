@@ -1395,7 +1395,6 @@ class PyToolkit:
 
     def on_tts_current_word(self, value):
         print(value)
-        idOfConcernedTask, word = value
         if len(self.current_words>18):
             self.current_words += value
         else:
