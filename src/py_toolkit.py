@@ -1398,9 +1398,9 @@ class PyToolkit:
         print(self.current_words)
         print(len(self.current_words))
         if len(self.current_words>18):
-            self.current_words += value
+            self.current_words += str(value)
         else:
-            self.current_words = value
+            self.current_words = str(value)
         if self.showing_words:
             script = """
 		outputDiv = document.getElementById('output');
