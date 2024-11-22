@@ -124,8 +124,8 @@ class PyToolkit:
         )
         print(consoleFormatter.format("ALMotion/move subscriber is up!", "OKGREEN"))
 
-        #self.speechSubscriber = rospy.Subscriber("/speech", speech_msg, self.on_words)
-        #print(consoleFormatter.format("/speech subscriber is up!", "OKGREEN"))
+        self.speechSubscriber = rospy.Subscriber("/speech", speech_msg, self.on_words)
+        print(consoleFormatter.format("/speech subscriber is up!", "OKGREEN"))
 
         self.ALMemory = session.service("ALMemory")
 
@@ -133,11 +133,6 @@ class PyToolkit:
             "ALTextToSpeech/Status"
         )
         self.ALTextToSpeechStatusSubscriber.signal.connect(self.on_tts_status)
-
-        self.ALTextToSpeechCurrentWordSubscriber = self.ALMemory.subscriber(
-            "ALTextToSpeech/CurrentWord"
-        )
-        self.ALTextToSpeechCurrentWordSubscriber.signal.connect(self.on_tts_current_word)
 
         self.ALSpeechRecognitionSubscriber = self.ALMemory.subscriber("WordRecognized")
         self.ALSpeechRecognitionSubscriber.signal.connect(
@@ -588,8 +583,6 @@ class PyToolkit:
 
         # Variable for show_words service
         self.showing_words = False
-
-        self.current_words = ""
 
         # Service ROS Servers - ALPerception
         # self.Server = rospy.Service('pytoolkit/ALPerception/Tshirt_color_srv', Tshirt_color_srv, self.callback_Tshirt_color__srv)
@@ -1244,7 +1237,6 @@ class PyToolkit:
             )
         )
         self.showing_words = True
-        self.current_words = ""
         try:
             self.ALTabletService.showWebview(
                 "http://198.18.0.1/apps/robot-page/show_words.html"
@@ -1392,19 +1384,6 @@ class PyToolkit:
         self.ALTextToSpeechStatusPublisher.publish(
             text_to_speech_status_msg(idOfConcernedTask, status)
         )
-
-    def on_tts_current_word(self, value):
-        if len(self.current_words)>18:
-            self.current_words += str(value)
-        else:
-            self.current_words = str(value)
-        if self.showing_words:
-            script = """
-		outputDiv = document.getElementById('output');
-		outputDiv.innerText = "+++";
-            """
-            script = script.replace("+++",self.current_words)
-            self.ALTabletService.executeJS(script)
 
     def on_move_failed(self, value):
         self.ALMotionFailedPublisher.publish(speech_recognition_status_msg(value[0]))
